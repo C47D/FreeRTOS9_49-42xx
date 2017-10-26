@@ -121,15 +121,15 @@
 #define configTIMER_QUEUE_LENGTH                10
 #define configTIMER_TASK_STACK_DEPTH            configMINIMAL_STACK_SIZE
 
-#define INCLUDE_vTaskPrioritySet			1
-#define INCLUDE_uxTaskPriorityGet			1
-#define INCLUDE_vTaskDelete					1
-#define INCLUDE_vTaskCleanUpResources		0
-#define INCLUDE_vTaskSuspend				1
-#define INCLUDE_vTaskDelayUntil				1
-#define INCLUDE_vTaskDelay					1
-#define INCLUDE_uxTaskGetStackHighWaterMark	1
-#define INCLUDE_eTaskGetState				1
+#define INCLUDE_vTaskPrioritySet			    1
+#define INCLUDE_uxTaskPriorityGet			    1
+#define INCLUDE_vTaskDelete					    1
+#define INCLUDE_vTaskCleanUpResources		    0
+#define INCLUDE_vTaskSuspend				    1
+#define INCLUDE_vTaskDelayUntil				    1
+#define INCLUDE_vTaskDelay					    1
+#define INCLUDE_uxTaskGetStackHighWaterMark	    1
+#define INCLUDE_eTaskGetState				    1
 #define INCLUDE_xResumeFromISR                  1
 #define INCLUDE_xTaskGetSchedulerState          1
 #define INCLUDE_xTaskGetCurrentTaskHandle       1
@@ -140,22 +140,12 @@
 #define INCLUDE_xTaskGetHandle                  0
 #define INCLUDE_xTaskResumeFromISR              1
 
-/*
-//#define configPRIO_BITS       (3)
-#define configPRIO_BITS       __NVIC_PRIO_BITS
-#define configKERNEL_INTERRUPT_PRIORITY 	(7 << (8 - configPRIO_BITS))
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY 	(5 << (8 - configPRIO_BITS))
-*/
-
-#define configPRIO_BITS       __NVIC_PRIO_BITS        /* 4 priority levels */
-#define MIN_PRIORITY          ((1 << configPRIO_BITS) - 1)
-#define configKERNEL_INTERRUPT_PRIORITY 	( MIN_PRIORITY << (8 - configPRIO_BITS) ) /* The lowest priority. */
+#define configPRIO_BITS                         __NVIC_PRIO_BITS
+#define MIN_PRIORITY                            ((1 << configPRIO_BITS) - 1)
+#define configKERNEL_INTERRUPT_PRIORITY 	    ( MIN_PRIORITY << (8 - configPRIO_BITS) ) /* The lowest priority. */
 #define configMAX_SYSCALL_INTERRUPT_PRIORITY 	( 2 << (8 - configPRIO_BITS) )
-
-//#define configASSERT(x) if((x)==0) vAssertCalled(__FILE__, __LINE__)
     
-/* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS
-standard names. */
+/* Definitions that map the FreeRTOS port interrupt handlers to their CMSIS standard names. */
 #define vPortSVCHandler     SVC_Handler
 #define xPortPendSVHandler  PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
