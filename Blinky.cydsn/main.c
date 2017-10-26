@@ -15,7 +15,7 @@ int main(void)
         (TaskFunction_t) vLEDTask
         , "LED"
         , configMINIMAL_STACK_SIZE
-        , (void*) NULL
+        , (void*) 500
         , tskIDLE_PRIORITY + 1
         , NULL
     );
@@ -28,11 +28,13 @@ int main(void)
 
 static void vLEDTask(void *arg)
 {
-    (void) arg;
+    const TickType_t time = pdMS_TO_TICKS((TickType_t) arg);
     
     while(1) {
-        LED_Write(~LED_Read());
-        vTaskDelay(pdMS_TO_TICKS(1000)); // 7hz
+        LED_Write(0);
+        vTaskDelay(time);
+        LED_Write(1);
+        vTaskDelay(time);
     }
 }
 
