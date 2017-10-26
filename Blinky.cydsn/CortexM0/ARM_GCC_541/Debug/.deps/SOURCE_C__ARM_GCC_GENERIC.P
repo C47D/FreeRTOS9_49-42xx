@@ -1,0 +1,66 @@
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/CortexM0/ARM_GCC_541/Debug/main.o : C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyFlash.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyLFClk.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyLib.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/LED.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/LED_aliases.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_armcc.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_compiler.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_gcc.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/core_cm0.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/core_cm0_psoc4.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyPm.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydevice_trm.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydisabledsheets.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfitter.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfitter_cfg.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cypins.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cytypes.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/project.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/../portable/GCC/ATMega323/portmacro.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/../portable/IAR/ATMega323/portmacro.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/../portable/BCC/16BitDOS/PC/prtmacro.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/../portable/BCC/16BitDOS/flsh186/prtmacro.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/FreeRTOS.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/deprecated_definitions.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/list.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/mpu_wrappers.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/portable.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/projdefs.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/task.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/GCC/ARM_CM0/portmacro.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/FreeRTOSConfig.h C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/main.c 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyFlash.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyLFClk.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyLib.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/LED.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/LED_aliases.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_armcc.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_compiler.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cmsis_gcc.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/core_cm0.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/core_cm0_psoc4.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyPm.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydevice_trm.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydisabledsheets.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfitter.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfitter_cfg.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cypins.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cytypes.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/project.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/GCC/ATMega323/portmacro.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/IAR/ATMega323/portmacro.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/BCC/16BitDOS/PC/prtmacro.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/BCC/16BitDOS/flsh186/prtmacro.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/FreeRTOS.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/deprecated_definitions.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/list.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/mpu_wrappers.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/portable.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/projdefs.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/include/task.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/FreeRTOS/portable/GCC/ARM_CM0/portmacro.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/FreeRTOSConfig.h : 
+
+C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/main.c : 
+
