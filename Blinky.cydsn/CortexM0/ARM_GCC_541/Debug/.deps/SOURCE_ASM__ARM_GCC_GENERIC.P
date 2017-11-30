@@ -1,8 +1,0 @@
-C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/CortexM0/ARM_GCC_541/Debug/CyBootAsmGnu.o : C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyBootAsmGnu.s C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydevicegnu_trm.inc C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfittergnu.inc 
-
-C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/CyBootAsmGnu.s : 
-
-C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cydevicegnu_trm.inc : 
-
-C:/Users/Xwx47/Documents/Creator/FreeRTOS_49-42xx/Blinky.cydsn/Generated_Source/PSoC4/cyfittergnu.inc : 
-

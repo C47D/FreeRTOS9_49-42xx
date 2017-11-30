@@ -1,0 +1,19 @@
+(DELAYFILE
+ (SDFVERSION "IEEE 1497 4.0")
+ (DATE "2017-11-30T20:47:50Z")
+ (DESIGN "Blinky_FreeRTOS9")
+ (VENDOR "Cypress Semiconductor")
+ (PROGRAM "PSoC Creator")
+ (VERSION " 4.1 Update 1")
+ (DIVIDER .)
+ (TIMESCALE 1 ns)
+ (CELL
+  (CELLTYPE "Blinky_FreeRTOS9")
+  (INSTANCE *)
+  (DELAY
+   (ABSOLUTE
+    (INTERCONNECT LED\(0\)_PAD LED\(0\).pad_in (0.000:0.000:0.000))
+   )
+  )
+ )
+)

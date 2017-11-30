@@ -1,6 +1,0 @@
-C:\Users\Xwx47\Documents\Creator\FreeRTOS_49-42xx\Blinky.cydsn\Blinky.cyprj|17c4fe2b-26a4-4cba-a30d-f716c3e96bc8
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|b395b4dc-1329-40d0-bc8f-6833ca37dd8d
-C:\Users\Xwx47\Documents\PSoC Creator\4.1\Downloads ( 4.1).cylib\Downloads ( 4.1).cyprj|80ee0e31-905d-4c93-8fef-bcdef6489a27
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|dd308786-9655-43f4-ae9b-9c65fbfebe08
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|bbbcf958-852c-401a-9d81-b81588050f03
-C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|858e9ad6-1917-407f-9be0-4a3a2d14e851
