@@ -1,0 +1,8 @@
+C:\Users\Xwx47\Documents\Creator\FreeRTOS_49-42xx\Blinky_FreeRTOS9.cydsn\Blinky_FreeRTOS9.cyprj|89369a3b-5b35-4b7b-a70e-9fde30ad10d3
+C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\default\CyAnnotationLibrary\CyAnnotationLibrary.cylib\CyAnnotationLibrary.cyprj|88fadcc7-b9b4-4ca2-a06a-808492bd632f
+C:\Users\Xwx47\Documents\PSoC Creator\4.1\Downloads ( 4.1).cylib\Downloads ( 4.1).cyprj|d569cab5-39fe-400a-8056-de7c21aef69f
+C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibraryupdates\CyComponentLibraryUpdates.cylib\CyComponentLibraryUpdates.cyprj|c4ba67d5-db7b-463b-a76e-be9837775eff
+C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CyComponentLibrary.cyprj|8b18e4fc-86b4-4bd4-badf-2bb0e3c516b3
+C:\Program Files (x86)\Cypress\PSoC Creator\4.1\PSoC Creator\psoc\content\cyprimitives\CyPrimitives.cylib\CyPrimitives.cyprj|44db280e-3a54-4c1a-be6a-921c5f7c0d97
+C:\Users\Xwx47\Documents\Creator\FreeRTOS_49-42xx\Blinky_FreeRTOS10.cydsn\Blinky_FreeRTOS10.cyprj|0bf7ad00-3a10-4322-9c14-e47b95f34cbe
+C:\Users\Xwx47\Documents\Creator\FreeRTOS_49-42xx\UART_MessageBuffer_FreeRTOS10.cydsn\UART_MessageBuffer_FreeRTOS10.cyprj|c486131e-ce90-408e-815f-4cb7ca411afb

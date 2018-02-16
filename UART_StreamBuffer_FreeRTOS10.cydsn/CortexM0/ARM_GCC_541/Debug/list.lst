@@ -1,0 +1,1370 @@
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"list.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.vListInitialise,"ax",%progbits
+  20              		.align	2
+  21              		.global	vListInitialise
+  22              		.code	16
+  23              		.thumb_func
+  24              		.type	vListInitialise, %function
+  25              	vListInitialise:
+  26              	.LFB32:
+  27              		.file 1 "..\\FreeRTOS10\\list.c"
+   1:..\FreeRTOS10/list.c **** /*
+   2:..\FreeRTOS10/list.c ****  * FreeRTOS Kernel V10.0.0
+   3:..\FreeRTOS10/list.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\FreeRTOS10/list.c ****  *
+   5:..\FreeRTOS10/list.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\FreeRTOS10/list.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\FreeRTOS10/list.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\FreeRTOS10/list.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\FreeRTOS10/list.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\FreeRTOS10/list.c ****  * subject to the following conditions:
+  11:..\FreeRTOS10/list.c ****  *
+  12:..\FreeRTOS10/list.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\FreeRTOS10/list.c ****  * copies or substantial portions of the Software. If you wish to use our Amazon
+  14:..\FreeRTOS10/list.c ****  * FreeRTOS name, please do so in a fair use way that does not cause confusion.
+  15:..\FreeRTOS10/list.c ****  *
+  16:..\FreeRTOS10/list.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  17:..\FreeRTOS10/list.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  18:..\FreeRTOS10/list.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  19:..\FreeRTOS10/list.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  20:..\FreeRTOS10/list.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  21:..\FreeRTOS10/list.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  22:..\FreeRTOS10/list.c ****  *
+  23:..\FreeRTOS10/list.c ****  * http://www.FreeRTOS.org
+  24:..\FreeRTOS10/list.c ****  * http://aws.amazon.com/freertos
+  25:..\FreeRTOS10/list.c ****  *
+  26:..\FreeRTOS10/list.c ****  * 1 tab == 4 spaces!
+  27:..\FreeRTOS10/list.c ****  */
+  28:..\FreeRTOS10/list.c **** 
+  29:..\FreeRTOS10/list.c **** 
+  30:..\FreeRTOS10/list.c **** #include <stdlib.h>
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 2
+
+
+  31:..\FreeRTOS10/list.c **** #include "FreeRTOS.h"
+  32:..\FreeRTOS10/list.c **** #include "list.h"
+  33:..\FreeRTOS10/list.c **** 
+  34:..\FreeRTOS10/list.c **** /*-----------------------------------------------------------
+  35:..\FreeRTOS10/list.c ****  * PUBLIC LIST API documented in list.h
+  36:..\FreeRTOS10/list.c ****  *----------------------------------------------------------*/
+  37:..\FreeRTOS10/list.c **** 
+  38:..\FreeRTOS10/list.c **** void vListInitialise( List_t * const pxList )
+  39:..\FreeRTOS10/list.c **** {
+  28              		.loc 1 39 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  40:..\FreeRTOS10/list.c **** 	/* The list structure contains a list item which is used to mark the
+  41:..\FreeRTOS10/list.c **** 	end of the list.  To initialise the list the list end is inserted
+  42:..\FreeRTOS10/list.c **** 	as the only list entry. */
+  43:..\FreeRTOS10/list.c **** 	pxList->pxIndex = ( ListItem_t * ) &( pxList->xListEnd );			/*lint !e826 !e740 The mini list struc
+  34              		.loc 1 43 0
+  35 0000 0300     		movs	r3, r0
+  36 0002 0833     		adds	r3, r3, #8
+  37 0004 4360     		str	r3, [r0, #4]
+  44:..\FreeRTOS10/list.c **** 
+  45:..\FreeRTOS10/list.c **** 	/* The list end value is the highest possible value in the list to
+  46:..\FreeRTOS10/list.c **** 	ensure it remains at the end of the list. */
+  47:..\FreeRTOS10/list.c **** 	pxList->xListEnd.xItemValue = portMAX_DELAY;
+  38              		.loc 1 47 0
+  39 0006 0122     		movs	r2, #1
+  40 0008 5242     		rsbs	r2, r2, #0
+  41 000a 8260     		str	r2, [r0, #8]
+  48:..\FreeRTOS10/list.c **** 
+  49:..\FreeRTOS10/list.c **** 	/* The list end next and previous pointers point to itself so we know
+  50:..\FreeRTOS10/list.c **** 	when the list is empty. */
+  51:..\FreeRTOS10/list.c **** 	pxList->xListEnd.pxNext = ( ListItem_t * ) &( pxList->xListEnd );	/*lint !e826 !e740 The mini list
+  42              		.loc 1 51 0
+  43 000c C360     		str	r3, [r0, #12]
+  52:..\FreeRTOS10/list.c **** 	pxList->xListEnd.pxPrevious = ( ListItem_t * ) &( pxList->xListEnd );/*lint !e826 !e740 The mini l
+  44              		.loc 1 52 0
+  45 000e 0361     		str	r3, [r0, #16]
+  53:..\FreeRTOS10/list.c **** 
+  54:..\FreeRTOS10/list.c **** 	pxList->uxNumberOfItems = ( UBaseType_t ) 0U;
+  46              		.loc 1 54 0
+  47 0010 0023     		movs	r3, #0
+  48 0012 0360     		str	r3, [r0]
+  55:..\FreeRTOS10/list.c **** 
+  56:..\FreeRTOS10/list.c **** 	/* Write known values into the list if
+  57:..\FreeRTOS10/list.c **** 	configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+  58:..\FreeRTOS10/list.c **** 	listSET_LIST_INTEGRITY_CHECK_1_VALUE( pxList );
+  59:..\FreeRTOS10/list.c **** 	listSET_LIST_INTEGRITY_CHECK_2_VALUE( pxList );
+  60:..\FreeRTOS10/list.c **** }
+  49              		.loc 1 60 0
+  50              		@ sp needed
+  51 0014 7047     		bx	lr
+  52              		.cfi_endproc
+  53              	.LFE32:
+  54              		.size	vListInitialise, .-vListInitialise
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 3
+
+
+  55 0016 C046     		.section	.text.vListInitialiseItem,"ax",%progbits
+  56              		.align	2
+  57              		.global	vListInitialiseItem
+  58              		.code	16
+  59              		.thumb_func
+  60              		.type	vListInitialiseItem, %function
+  61              	vListInitialiseItem:
+  62              	.LFB33:
+  61:..\FreeRTOS10/list.c **** /*-----------------------------------------------------------*/
+  62:..\FreeRTOS10/list.c **** 
+  63:..\FreeRTOS10/list.c **** void vListInitialiseItem( ListItem_t * const pxItem )
+  64:..\FreeRTOS10/list.c **** {
+  63              		.loc 1 64 0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 0
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              		@ link register save eliminated.
+  68              	.LVL1:
+  65:..\FreeRTOS10/list.c **** 	/* Make sure the list item is not recorded as being on a list. */
+  66:..\FreeRTOS10/list.c **** 	pxItem->pvContainer = NULL;
+  69              		.loc 1 66 0
+  70 0000 0023     		movs	r3, #0
+  71 0002 0361     		str	r3, [r0, #16]
+  67:..\FreeRTOS10/list.c **** 
+  68:..\FreeRTOS10/list.c **** 	/* Write known values into the list item if
+  69:..\FreeRTOS10/list.c **** 	configUSE_LIST_DATA_INTEGRITY_CHECK_BYTES is set to 1. */
+  70:..\FreeRTOS10/list.c **** 	listSET_FIRST_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
+  71:..\FreeRTOS10/list.c **** 	listSET_SECOND_LIST_ITEM_INTEGRITY_CHECK_VALUE( pxItem );
+  72:..\FreeRTOS10/list.c **** }
+  72              		.loc 1 72 0
+  73              		@ sp needed
+  74 0004 7047     		bx	lr
+  75              		.cfi_endproc
+  76              	.LFE33:
+  77              		.size	vListInitialiseItem, .-vListInitialiseItem
+  78 0006 C046     		.section	.text.vListInsertEnd,"ax",%progbits
+  79              		.align	2
+  80              		.global	vListInsertEnd
+  81              		.code	16
+  82              		.thumb_func
+  83              		.type	vListInsertEnd, %function
+  84              	vListInsertEnd:
+  85              	.LFB34:
+  73:..\FreeRTOS10/list.c **** /*-----------------------------------------------------------*/
+  74:..\FreeRTOS10/list.c **** 
+  75:..\FreeRTOS10/list.c **** void vListInsertEnd( List_t * const pxList, ListItem_t * const pxNewListItem )
+  76:..\FreeRTOS10/list.c **** {
+  86              		.loc 1 76 0
+  87              		.cfi_startproc
+  88              		@ args = 0, pretend = 0, frame = 0
+  89              		@ frame_needed = 0, uses_anonymous_args = 0
+  90              		@ link register save eliminated.
+  91              	.LVL2:
+  77:..\FreeRTOS10/list.c **** ListItem_t * const pxIndex = pxList->pxIndex;
+  92              		.loc 1 77 0
+  93 0000 4368     		ldr	r3, [r0, #4]
+  94              	.LVL3:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 4
+
+
+  78:..\FreeRTOS10/list.c **** 
+  79:..\FreeRTOS10/list.c **** 	/* Only effective when configASSERT() is also defined, these tests may catch
+  80:..\FreeRTOS10/list.c **** 	the list data structures being overwritten in memory.  They will not catch
+  81:..\FreeRTOS10/list.c **** 	data errors caused by incorrect configuration or use of FreeRTOS. */
+  82:..\FreeRTOS10/list.c **** 	listTEST_LIST_INTEGRITY( pxList );
+  83:..\FreeRTOS10/list.c **** 	listTEST_LIST_ITEM_INTEGRITY( pxNewListItem );
+  84:..\FreeRTOS10/list.c **** 
+  85:..\FreeRTOS10/list.c **** 	/* Insert a new list item into pxList, but rather than sort the list,
+  86:..\FreeRTOS10/list.c **** 	makes the new list item the last item to be removed by a call to
+  87:..\FreeRTOS10/list.c **** 	listGET_OWNER_OF_NEXT_ENTRY(). */
+  88:..\FreeRTOS10/list.c **** 	pxNewListItem->pxNext = pxIndex;
+  95              		.loc 1 88 0
+  96 0002 4B60     		str	r3, [r1, #4]
+  89:..\FreeRTOS10/list.c **** 	pxNewListItem->pxPrevious = pxIndex->pxPrevious;
+  97              		.loc 1 89 0
+  98 0004 9A68     		ldr	r2, [r3, #8]
+  99 0006 8A60     		str	r2, [r1, #8]
+  90:..\FreeRTOS10/list.c **** 
+  91:..\FreeRTOS10/list.c **** 	/* Only used during decision coverage testing. */
+  92:..\FreeRTOS10/list.c **** 	mtCOVERAGE_TEST_DELAY();
+  93:..\FreeRTOS10/list.c **** 
+  94:..\FreeRTOS10/list.c **** 	pxIndex->pxPrevious->pxNext = pxNewListItem;
+ 100              		.loc 1 94 0
+ 101 0008 9A68     		ldr	r2, [r3, #8]
+ 102 000a 5160     		str	r1, [r2, #4]
+  95:..\FreeRTOS10/list.c **** 	pxIndex->pxPrevious = pxNewListItem;
+ 103              		.loc 1 95 0
+ 104 000c 9960     		str	r1, [r3, #8]
+  96:..\FreeRTOS10/list.c **** 
+  97:..\FreeRTOS10/list.c **** 	/* Remember which list the item is in. */
+  98:..\FreeRTOS10/list.c **** 	pxNewListItem->pvContainer = ( void * ) pxList;
+ 105              		.loc 1 98 0
+ 106 000e 0861     		str	r0, [r1, #16]
+  99:..\FreeRTOS10/list.c **** 
+ 100:..\FreeRTOS10/list.c **** 	( pxList->uxNumberOfItems )++;
+ 107              		.loc 1 100 0
+ 108 0010 0368     		ldr	r3, [r0]
+ 109              	.LVL4:
+ 110 0012 0133     		adds	r3, r3, #1
+ 111 0014 0360     		str	r3, [r0]
+ 101:..\FreeRTOS10/list.c **** }
+ 112              		.loc 1 101 0
+ 113              		@ sp needed
+ 114 0016 7047     		bx	lr
+ 115              		.cfi_endproc
+ 116              	.LFE34:
+ 117              		.size	vListInsertEnd, .-vListInsertEnd
+ 118              		.section	.text.vListInsert,"ax",%progbits
+ 119              		.align	2
+ 120              		.global	vListInsert
+ 121              		.code	16
+ 122              		.thumb_func
+ 123              		.type	vListInsert, %function
+ 124              	vListInsert:
+ 125              	.LFB35:
+ 102:..\FreeRTOS10/list.c **** /*-----------------------------------------------------------*/
+ 103:..\FreeRTOS10/list.c **** 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 5
+
+
+ 104:..\FreeRTOS10/list.c **** void vListInsert( List_t * const pxList, ListItem_t * const pxNewListItem )
+ 105:..\FreeRTOS10/list.c **** {
+ 126              		.loc 1 105 0
+ 127              		.cfi_startproc
+ 128              		@ args = 0, pretend = 0, frame = 0
+ 129              		@ frame_needed = 0, uses_anonymous_args = 0
+ 130              	.LVL5:
+ 131 0000 30B5     		push	{r4, r5, lr}
+ 132              		.cfi_def_cfa_offset 12
+ 133              		.cfi_offset 4, -12
+ 134              		.cfi_offset 5, -8
+ 135              		.cfi_offset 14, -4
+ 106:..\FreeRTOS10/list.c **** ListItem_t *pxIterator;
+ 107:..\FreeRTOS10/list.c **** const TickType_t xValueOfInsertion = pxNewListItem->xItemValue;
+ 136              		.loc 1 107 0
+ 137 0002 0C68     		ldr	r4, [r1]
+ 138              	.LVL6:
+ 108:..\FreeRTOS10/list.c **** 
+ 109:..\FreeRTOS10/list.c **** 	/* Only effective when configASSERT() is also defined, these tests may catch
+ 110:..\FreeRTOS10/list.c **** 	the list data structures being overwritten in memory.  They will not catch
+ 111:..\FreeRTOS10/list.c **** 	data errors caused by incorrect configuration or use of FreeRTOS. */
+ 112:..\FreeRTOS10/list.c **** 	listTEST_LIST_INTEGRITY( pxList );
+ 113:..\FreeRTOS10/list.c **** 	listTEST_LIST_ITEM_INTEGRITY( pxNewListItem );
+ 114:..\FreeRTOS10/list.c **** 
+ 115:..\FreeRTOS10/list.c **** 	/* Insert the new list item into the list, sorted in xItemValue order.
+ 116:..\FreeRTOS10/list.c **** 
+ 117:..\FreeRTOS10/list.c **** 	If the list already contains a list item with the same item value then the
+ 118:..\FreeRTOS10/list.c **** 	new list item should be placed after it.  This ensures that TCB's which are
+ 119:..\FreeRTOS10/list.c **** 	stored in ready lists (all of which have the same xItemValue value) get a
+ 120:..\FreeRTOS10/list.c **** 	share of the CPU.  However, if the xItemValue is the same as the back marker
+ 121:..\FreeRTOS10/list.c **** 	the iteration loop below will not end.  Therefore the value is checked
+ 122:..\FreeRTOS10/list.c **** 	first, and the algorithm slightly modified if necessary. */
+ 123:..\FreeRTOS10/list.c **** 	if( xValueOfInsertion == portMAX_DELAY )
+ 139              		.loc 1 123 0
+ 140 0004 631C     		adds	r3, r4, #1
+ 141 0006 01D1     		bne	.L5
+ 124:..\FreeRTOS10/list.c **** 	{
+ 125:..\FreeRTOS10/list.c **** 		pxIterator = pxList->xListEnd.pxPrevious;
+ 142              		.loc 1 125 0
+ 143 0008 0269     		ldr	r2, [r0, #16]
+ 144              	.LVL7:
+ 145 000a 07E0     		b	.L6
+ 146              	.LVL8:
+ 147              	.L5:
+ 126:..\FreeRTOS10/list.c **** 	}
+ 127:..\FreeRTOS10/list.c **** 	else
+ 128:..\FreeRTOS10/list.c **** 	{
+ 129:..\FreeRTOS10/list.c **** 		/* *** NOTE ***********************************************************
+ 130:..\FreeRTOS10/list.c **** 		If you find your application is crashing here then likely causes are
+ 131:..\FreeRTOS10/list.c **** 		listed below.  In addition see http://www.freertos.org/FAQHelp.html for
+ 132:..\FreeRTOS10/list.c **** 		more tips, and ensure configASSERT() is defined!
+ 133:..\FreeRTOS10/list.c **** 		http://www.freertos.org/a00110.html#configASSERT
+ 134:..\FreeRTOS10/list.c **** 
+ 135:..\FreeRTOS10/list.c **** 			1) Stack overflow -
+ 136:..\FreeRTOS10/list.c **** 			   see http://www.freertos.org/Stacks-and-stack-overflow-checking.html
+ 137:..\FreeRTOS10/list.c **** 			2) Incorrect interrupt priority assignment, especially on Cortex-M
+ 138:..\FreeRTOS10/list.c **** 			   parts where numerically high priority values denote low actual
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 6
+
+
+ 139:..\FreeRTOS10/list.c **** 			   interrupt priorities, which can seem counter intuitive.  See
+ 140:..\FreeRTOS10/list.c **** 			   http://www.freertos.org/RTOS-Cortex-M3-M4.html and the definition
+ 141:..\FreeRTOS10/list.c **** 			   of configMAX_SYSCALL_INTERRUPT_PRIORITY on
+ 142:..\FreeRTOS10/list.c **** 			   http://www.freertos.org/a00110.html
+ 143:..\FreeRTOS10/list.c **** 			3) Calling an API function from within a critical section or when
+ 144:..\FreeRTOS10/list.c **** 			   the scheduler is suspended, or calling an API function that does
+ 145:..\FreeRTOS10/list.c **** 			   not end in "FromISR" from an interrupt.
+ 146:..\FreeRTOS10/list.c **** 			4) Using a queue or semaphore before it has been initialised or
+ 147:..\FreeRTOS10/list.c **** 			   before the scheduler has been started (are interrupts firing
+ 148:..\FreeRTOS10/list.c **** 			   before vTaskStartScheduler() has been called?).
+ 149:..\FreeRTOS10/list.c **** 		**********************************************************************/
+ 150:..\FreeRTOS10/list.c **** 
+ 151:..\FreeRTOS10/list.c **** 		for( pxIterator = ( ListItem_t * ) &( pxList->xListEnd ); pxIterator->pxNext->xItemValue <= xValu
+ 148              		.loc 1 151 0
+ 149 000c 0200     		movs	r2, r0
+ 150 000e 0832     		adds	r2, r2, #8
+ 151              	.LVL9:
+ 152 0010 00E0     		b	.L7
+ 153              	.L8:
+ 154 0012 1A00     		movs	r2, r3
+ 155              	.LVL10:
+ 156              	.L7:
+ 157              		.loc 1 151 0 is_stmt 0 discriminator 1
+ 158 0014 5368     		ldr	r3, [r2, #4]
+ 159 0016 1D68     		ldr	r5, [r3]
+ 160 0018 AC42     		cmp	r4, r5
+ 161 001a FAD2     		bcs	.L8
+ 162              	.L6:
+ 152:..\FreeRTOS10/list.c **** 		{
+ 153:..\FreeRTOS10/list.c **** 			/* There is nothing to do here, just iterating to the wanted
+ 154:..\FreeRTOS10/list.c **** 			insertion position. */
+ 155:..\FreeRTOS10/list.c **** 		}
+ 156:..\FreeRTOS10/list.c **** 	}
+ 157:..\FreeRTOS10/list.c **** 
+ 158:..\FreeRTOS10/list.c **** 	pxNewListItem->pxNext = pxIterator->pxNext;
+ 163              		.loc 1 158 0 is_stmt 1
+ 164 001c 5368     		ldr	r3, [r2, #4]
+ 165 001e 4B60     		str	r3, [r1, #4]
+ 159:..\FreeRTOS10/list.c **** 	pxNewListItem->pxNext->pxPrevious = pxNewListItem;
+ 166              		.loc 1 159 0
+ 167 0020 9960     		str	r1, [r3, #8]
+ 160:..\FreeRTOS10/list.c **** 	pxNewListItem->pxPrevious = pxIterator;
+ 168              		.loc 1 160 0
+ 169 0022 8A60     		str	r2, [r1, #8]
+ 161:..\FreeRTOS10/list.c **** 	pxIterator->pxNext = pxNewListItem;
+ 170              		.loc 1 161 0
+ 171 0024 5160     		str	r1, [r2, #4]
+ 162:..\FreeRTOS10/list.c **** 
+ 163:..\FreeRTOS10/list.c **** 	/* Remember which list the item is in.  This allows fast removal of the
+ 164:..\FreeRTOS10/list.c **** 	item later. */
+ 165:..\FreeRTOS10/list.c **** 	pxNewListItem->pvContainer = ( void * ) pxList;
+ 172              		.loc 1 165 0
+ 173 0026 0861     		str	r0, [r1, #16]
+ 166:..\FreeRTOS10/list.c **** 
+ 167:..\FreeRTOS10/list.c **** 	( pxList->uxNumberOfItems )++;
+ 174              		.loc 1 167 0
+ 175 0028 0368     		ldr	r3, [r0]
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 7
+
+
+ 176 002a 0133     		adds	r3, r3, #1
+ 177 002c 0360     		str	r3, [r0]
+ 168:..\FreeRTOS10/list.c **** }
+ 178              		.loc 1 168 0
+ 179              		@ sp needed
+ 180              	.LVL11:
+ 181 002e 30BD     		pop	{r4, r5, pc}
+ 182              		.cfi_endproc
+ 183              	.LFE35:
+ 184              		.size	vListInsert, .-vListInsert
+ 185              		.section	.text.uxListRemove,"ax",%progbits
+ 186              		.align	2
+ 187              		.global	uxListRemove
+ 188              		.code	16
+ 189              		.thumb_func
+ 190              		.type	uxListRemove, %function
+ 191              	uxListRemove:
+ 192              	.LFB36:
+ 169:..\FreeRTOS10/list.c **** /*-----------------------------------------------------------*/
+ 170:..\FreeRTOS10/list.c **** 
+ 171:..\FreeRTOS10/list.c **** UBaseType_t uxListRemove( ListItem_t * const pxItemToRemove )
+ 172:..\FreeRTOS10/list.c **** {
+ 193              		.loc 1 172 0
+ 194              		.cfi_startproc
+ 195              		@ args = 0, pretend = 0, frame = 0
+ 196              		@ frame_needed = 0, uses_anonymous_args = 0
+ 197              		@ link register save eliminated.
+ 198              	.LVL12:
+ 173:..\FreeRTOS10/list.c **** /* The list item knows which list it is in.  Obtain the list from the list
+ 174:..\FreeRTOS10/list.c **** item. */
+ 175:..\FreeRTOS10/list.c **** List_t * const pxList = ( List_t * ) pxItemToRemove->pvContainer;
+ 199              		.loc 1 175 0
+ 200 0000 0369     		ldr	r3, [r0, #16]
+ 201              	.LVL13:
+ 176:..\FreeRTOS10/list.c **** 
+ 177:..\FreeRTOS10/list.c **** 	pxItemToRemove->pxNext->pxPrevious = pxItemToRemove->pxPrevious;
+ 202              		.loc 1 177 0
+ 203 0002 4268     		ldr	r2, [r0, #4]
+ 204 0004 8168     		ldr	r1, [r0, #8]
+ 205 0006 9160     		str	r1, [r2, #8]
+ 178:..\FreeRTOS10/list.c **** 	pxItemToRemove->pxPrevious->pxNext = pxItemToRemove->pxNext;
+ 206              		.loc 1 178 0
+ 207 0008 8268     		ldr	r2, [r0, #8]
+ 208 000a 4168     		ldr	r1, [r0, #4]
+ 209 000c 5160     		str	r1, [r2, #4]
+ 179:..\FreeRTOS10/list.c **** 
+ 180:..\FreeRTOS10/list.c **** 	/* Only used during decision coverage testing. */
+ 181:..\FreeRTOS10/list.c **** 	mtCOVERAGE_TEST_DELAY();
+ 182:..\FreeRTOS10/list.c **** 
+ 183:..\FreeRTOS10/list.c **** 	/* Make sure the index is left pointing to a valid item. */
+ 184:..\FreeRTOS10/list.c **** 	if( pxList->pxIndex == pxItemToRemove )
+ 210              		.loc 1 184 0
+ 211 000e 5A68     		ldr	r2, [r3, #4]
+ 212 0010 9042     		cmp	r0, r2
+ 213 0012 01D1     		bne	.L10
+ 185:..\FreeRTOS10/list.c **** 	{
+ 186:..\FreeRTOS10/list.c **** 		pxList->pxIndex = pxItemToRemove->pxPrevious;
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 8
+
+
+ 214              		.loc 1 186 0
+ 215 0014 8268     		ldr	r2, [r0, #8]
+ 216 0016 5A60     		str	r2, [r3, #4]
+ 217              	.L10:
+ 187:..\FreeRTOS10/list.c **** 	}
+ 188:..\FreeRTOS10/list.c **** 	else
+ 189:..\FreeRTOS10/list.c **** 	{
+ 190:..\FreeRTOS10/list.c **** 		mtCOVERAGE_TEST_MARKER();
+ 191:..\FreeRTOS10/list.c **** 	}
+ 192:..\FreeRTOS10/list.c **** 
+ 193:..\FreeRTOS10/list.c **** 	pxItemToRemove->pvContainer = NULL;
+ 218              		.loc 1 193 0
+ 219 0018 0022     		movs	r2, #0
+ 220 001a 0261     		str	r2, [r0, #16]
+ 194:..\FreeRTOS10/list.c **** 	( pxList->uxNumberOfItems )--;
+ 221              		.loc 1 194 0
+ 222 001c 1A68     		ldr	r2, [r3]
+ 223 001e 013A     		subs	r2, r2, #1
+ 224 0020 1A60     		str	r2, [r3]
+ 195:..\FreeRTOS10/list.c **** 
+ 196:..\FreeRTOS10/list.c **** 	return pxList->uxNumberOfItems;
+ 225              		.loc 1 196 0
+ 226 0022 1868     		ldr	r0, [r3]
+ 227              	.LVL14:
+ 197:..\FreeRTOS10/list.c **** }
+ 228              		.loc 1 197 0
+ 229              		@ sp needed
+ 230 0024 7047     		bx	lr
+ 231              		.cfi_endproc
+ 232              	.LFE36:
+ 233              		.size	uxListRemove, .-uxListRemove
+ 234 0026 C046     		.text
+ 235              	.Letext0:
+ 236              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.1\\psoc creator\\import\\gnu\\arm\\5.4.
+ 237              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.1\\psoc creator\\import\\gnu\\arm\\5.4.
+ 238              		.file 4 "..\\FreeRTOS10\\portable\\GCC\\ARM_CM0/portmacro.h"
+ 239              		.file 5 "..\\FreeRTOS10\\include/list.h"
+ 240              		.section	.debug_info,"",%progbits
+ 241              	.Ldebug_info0:
+ 242 0000 B0020000 		.4byte	0x2b0
+ 243 0004 0400     		.2byte	0x4
+ 244 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 245 000a 04       		.byte	0x4
+ 246 000b 01       		.uleb128 0x1
+ 247 000c 61010000 		.4byte	.LASF43
+ 248 0010 0C       		.byte	0xc
+ 249 0011 CD000000 		.4byte	.LASF44
+ 250 0015 0B020000 		.4byte	.LASF45
+ 251 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 252 001d 00000000 		.4byte	0
+ 253 0021 00000000 		.4byte	.Ldebug_line0
+ 254 0025 02       		.uleb128 0x2
+ 255 0026 04       		.byte	0x4
+ 256 0027 07       		.byte	0x7
+ 257 0028 08010000 		.4byte	.LASF0
+ 258 002c 03       		.uleb128 0x3
+ 259 002d 04       		.byte	0x4
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 9
+
+
+ 260 002e 05       		.byte	0x5
+ 261 002f 696E7400 		.ascii	"int\000"
+ 262 0033 02       		.uleb128 0x2
+ 263 0034 08       		.byte	0x8
+ 264 0035 05       		.byte	0x5
+ 265 0036 F8010000 		.4byte	.LASF1
+ 266 003a 02       		.uleb128 0x2
+ 267 003b 08       		.byte	0x8
+ 268 003c 04       		.byte	0x4
+ 269 003d 9B020000 		.4byte	.LASF2
+ 270 0041 02       		.uleb128 0x2
+ 271 0042 01       		.byte	0x1
+ 272 0043 06       		.byte	0x6
+ 273 0044 B7020000 		.4byte	.LASF3
+ 274 0048 02       		.uleb128 0x2
+ 275 0049 01       		.byte	0x1
+ 276 004a 08       		.byte	0x8
+ 277 004b 5E000000 		.4byte	.LASF4
+ 278 004f 02       		.uleb128 0x2
+ 279 0050 02       		.byte	0x2
+ 280 0051 05       		.byte	0x5
+ 281 0052 6C020000 		.4byte	.LASF5
+ 282 0056 02       		.uleb128 0x2
+ 283 0057 02       		.byte	0x2
+ 284 0058 07       		.byte	0x7
+ 285 0059 8D000000 		.4byte	.LASF6
+ 286 005d 02       		.uleb128 0x2
+ 287 005e 04       		.byte	0x4
+ 288 005f 05       		.byte	0x5
+ 289 0060 92020000 		.4byte	.LASF7
+ 290 0064 04       		.uleb128 0x4
+ 291 0065 C2000000 		.4byte	.LASF12
+ 292 0069 02       		.byte	0x2
+ 293 006a 41       		.byte	0x41
+ 294 006b 6F000000 		.4byte	0x6f
+ 295 006f 02       		.uleb128 0x2
+ 296 0070 04       		.byte	0x4
+ 297 0071 07       		.byte	0x7
+ 298 0072 6C000000 		.4byte	.LASF8
+ 299 0076 02       		.uleb128 0x2
+ 300 0077 08       		.byte	0x8
+ 301 0078 07       		.byte	0x7
+ 302 0079 37010000 		.4byte	.LASF9
+ 303 007d 02       		.uleb128 0x2
+ 304 007e 04       		.byte	0x4
+ 305 007f 07       		.byte	0x7
+ 306 0080 EF010000 		.4byte	.LASF10
+ 307 0084 05       		.uleb128 0x5
+ 308 0085 04       		.byte	0x4
+ 309 0086 02       		.uleb128 0x2
+ 310 0087 01       		.byte	0x1
+ 311 0088 08       		.byte	0x8
+ 312 0089 06020000 		.4byte	.LASF11
+ 313 008d 04       		.uleb128 0x4
+ 314 008e 89020000 		.4byte	.LASF13
+ 315 0092 03       		.byte	0x3
+ 316 0093 30       		.byte	0x30
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 10
+
+
+ 317 0094 64000000 		.4byte	0x64
+ 318 0098 02       		.uleb128 0x2
+ 319 0099 04       		.byte	0x4
+ 320 009a 04       		.byte	0x4
+ 321 009b 58000000 		.4byte	.LASF14
+ 322 009f 02       		.uleb128 0x2
+ 323 00a0 08       		.byte	0x8
+ 324 00a1 04       		.byte	0x4
+ 325 00a2 BB000000 		.4byte	.LASF15
+ 326 00a6 04       		.uleb128 0x4
+ 327 00a7 55010000 		.4byte	.LASF16
+ 328 00ab 04       		.byte	0x4
+ 329 00ac 3A       		.byte	0x3a
+ 330 00ad 6F000000 		.4byte	0x6f
+ 331 00b1 04       		.uleb128 0x4
+ 332 00b2 13000000 		.4byte	.LASF17
+ 333 00b6 04       		.byte	0x4
+ 334 00b7 40       		.byte	0x40
+ 335 00b8 8D000000 		.4byte	0x8d
+ 336 00bc 06       		.uleb128 0x6
+ 337 00bd 4D000000 		.4byte	.LASF24
+ 338 00c1 14       		.byte	0x14
+ 339 00c2 05       		.byte	0x5
+ 340 00c3 8C       		.byte	0x8c
+ 341 00c4 05010000 		.4byte	0x105
+ 342 00c8 07       		.uleb128 0x7
+ 343 00c9 2D000000 		.4byte	.LASF18
+ 344 00cd 05       		.byte	0x5
+ 345 00ce 8F       		.byte	0x8f
+ 346 00cf B1000000 		.4byte	0xb1
+ 347 00d3 00       		.byte	0
+ 348 00d4 07       		.uleb128 0x7
+ 349 00d5 01010000 		.4byte	.LASF19
+ 350 00d9 05       		.byte	0x5
+ 351 00da 90       		.byte	0x90
+ 352 00db 05010000 		.4byte	0x105
+ 353 00df 04       		.byte	0x4
+ 354 00e0 07       		.uleb128 0x7
+ 355 00e1 7E020000 		.4byte	.LASF20
+ 356 00e5 05       		.byte	0x5
+ 357 00e6 91       		.byte	0x91
+ 358 00e7 05010000 		.4byte	0x105
+ 359 00eb 08       		.byte	0x8
+ 360 00ec 07       		.uleb128 0x7
+ 361 00ed 00000000 		.4byte	.LASF21
+ 362 00f1 05       		.byte	0x5
+ 363 00f2 92       		.byte	0x92
+ 364 00f3 84000000 		.4byte	0x84
+ 365 00f7 0C       		.byte	0xc
+ 366 00f8 07       		.uleb128 0x7
+ 367 00f9 41000000 		.4byte	.LASF22
+ 368 00fd 05       		.byte	0x5
+ 369 00fe 93       		.byte	0x93
+ 370 00ff 84000000 		.4byte	0x84
+ 371 0103 10       		.byte	0x10
+ 372 0104 00       		.byte	0
+ 373 0105 08       		.uleb128 0x8
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 11
+
+
+ 374 0106 04       		.byte	0x4
+ 375 0107 BC000000 		.4byte	0xbc
+ 376 010b 04       		.uleb128 0x4
+ 377 010c 08000000 		.4byte	.LASF23
+ 378 0110 05       		.byte	0x5
+ 379 0111 96       		.byte	0x96
+ 380 0112 BC000000 		.4byte	0xbc
+ 381 0116 06       		.uleb128 0x6
+ 382 0117 A7020000 		.4byte	.LASF25
+ 383 011b 0C       		.byte	0xc
+ 384 011c 05       		.byte	0x5
+ 385 011d 98       		.byte	0x98
+ 386 011e 47010000 		.4byte	0x147
+ 387 0122 07       		.uleb128 0x7
+ 388 0123 2D000000 		.4byte	.LASF18
+ 389 0127 05       		.byte	0x5
+ 390 0128 9B       		.byte	0x9b
+ 391 0129 B1000000 		.4byte	0xb1
+ 392 012d 00       		.byte	0
+ 393 012e 07       		.uleb128 0x7
+ 394 012f 01010000 		.4byte	.LASF19
+ 395 0133 05       		.byte	0x5
+ 396 0134 9C       		.byte	0x9c
+ 397 0135 05010000 		.4byte	0x105
+ 398 0139 04       		.byte	0x4
+ 399 013a 07       		.uleb128 0x7
+ 400 013b 7E020000 		.4byte	.LASF20
+ 401 013f 05       		.byte	0x5
+ 402 0140 9D       		.byte	0x9d
+ 403 0141 05010000 		.4byte	0x105
+ 404 0145 08       		.byte	0x8
+ 405 0146 00       		.byte	0
+ 406 0147 04       		.uleb128 0x4
+ 407 0148 1E000000 		.4byte	.LASF26
+ 408 014c 05       		.byte	0x5
+ 409 014d 9F       		.byte	0x9f
+ 410 014e 16010000 		.4byte	0x116
+ 411 0152 06       		.uleb128 0x6
+ 412 0153 CA020000 		.4byte	.LASF27
+ 413 0157 14       		.byte	0x14
+ 414 0158 05       		.byte	0x5
+ 415 0159 A4       		.byte	0xa4
+ 416 015a 83010000 		.4byte	0x183
+ 417 015e 07       		.uleb128 0x7
+ 418 015f E2000000 		.4byte	.LASF28
+ 419 0163 05       		.byte	0x5
+ 420 0164 A7       		.byte	0xa7
+ 421 0165 83010000 		.4byte	0x183
+ 422 0169 00       		.byte	0
+ 423 016a 07       		.uleb128 0x7
+ 424 016b 76020000 		.4byte	.LASF29
+ 425 016f 05       		.byte	0x5
+ 426 0170 A8       		.byte	0xa8
+ 427 0171 88010000 		.4byte	0x188
+ 428 0175 04       		.byte	0x4
+ 429 0176 07       		.uleb128 0x7
+ 430 0177 38000000 		.4byte	.LASF30
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 12
+
+
+ 431 017b 05       		.byte	0x5
+ 432 017c A9       		.byte	0xa9
+ 433 017d 47010000 		.4byte	0x147
+ 434 0181 08       		.byte	0x8
+ 435 0182 00       		.byte	0
+ 436 0183 09       		.uleb128 0x9
+ 437 0184 A6000000 		.4byte	0xa6
+ 438 0188 08       		.uleb128 0x8
+ 439 0189 04       		.byte	0x4
+ 440 018a 0B010000 		.4byte	0x10b
+ 441 018e 04       		.uleb128 0x4
+ 442 018f B4000000 		.4byte	.LASF31
+ 443 0193 05       		.byte	0x5
+ 444 0194 AB       		.byte	0xab
+ 445 0195 52010000 		.4byte	0x152
+ 446 0199 0A       		.uleb128 0xa
+ 447 019a 15010000 		.4byte	.LASF32
+ 448 019e 01       		.byte	0x1
+ 449 019f 26       		.byte	0x26
+ 450 01a0 00000000 		.4byte	.LFB32
+ 451 01a4 16000000 		.4byte	.LFE32-.LFB32
+ 452 01a8 01       		.uleb128 0x1
+ 453 01a9 9C       		.byte	0x9c
+ 454 01aa BC010000 		.4byte	0x1bc
+ 455 01ae 0B       		.uleb128 0xb
+ 456 01af C3020000 		.4byte	.LASF34
+ 457 01b3 01       		.byte	0x1
+ 458 01b4 26       		.byte	0x26
+ 459 01b5 C2010000 		.4byte	0x1c2
+ 460 01b9 01       		.uleb128 0x1
+ 461 01ba 50       		.byte	0x50
+ 462 01bb 00       		.byte	0
+ 463 01bc 08       		.uleb128 0x8
+ 464 01bd 04       		.byte	0x4
+ 465 01be 8E010000 		.4byte	0x18e
+ 466 01c2 0C       		.uleb128 0xc
+ 467 01c3 BC010000 		.4byte	0x1bc
+ 468 01c7 0A       		.uleb128 0xa
+ 469 01c8 A0000000 		.4byte	.LASF33
+ 470 01cc 01       		.byte	0x1
+ 471 01cd 3F       		.byte	0x3f
+ 472 01ce 00000000 		.4byte	.LFB33
+ 473 01d2 06000000 		.4byte	.LFE33-.LFB33
+ 474 01d6 01       		.uleb128 0x1
+ 475 01d7 9C       		.byte	0x9c
+ 476 01d8 EA010000 		.4byte	0x1ea
+ 477 01dc 0B       		.uleb128 0xb
+ 478 01dd 4E010000 		.4byte	.LASF35
+ 479 01e1 01       		.byte	0x1
+ 480 01e2 3F       		.byte	0x3f
+ 481 01e3 EA010000 		.4byte	0x1ea
+ 482 01e7 01       		.uleb128 0x1
+ 483 01e8 50       		.byte	0x50
+ 484 01e9 00       		.byte	0
+ 485 01ea 0C       		.uleb128 0xc
+ 486 01eb 88010000 		.4byte	0x188
+ 487 01ef 0A       		.uleb128 0xa
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 13
+
+
+ 488 01f0 F2000000 		.4byte	.LASF36
+ 489 01f4 01       		.byte	0x1
+ 490 01f5 4B       		.byte	0x4b
+ 491 01f6 00000000 		.4byte	.LFB34
+ 492 01fa 18000000 		.4byte	.LFE34-.LFB34
+ 493 01fe 01       		.uleb128 0x1
+ 494 01ff 9C       		.byte	0x9c
+ 495 0200 2E020000 		.4byte	0x22e
+ 496 0204 0B       		.uleb128 0xb
+ 497 0205 C3020000 		.4byte	.LASF34
+ 498 0209 01       		.byte	0x1
+ 499 020a 4B       		.byte	0x4b
+ 500 020b C2010000 		.4byte	0x1c2
+ 501 020f 01       		.uleb128 0x1
+ 502 0210 50       		.byte	0x50
+ 503 0211 0B       		.uleb128 0xb
+ 504 0212 DD020000 		.4byte	.LASF37
+ 505 0216 01       		.byte	0x1
+ 506 0217 4B       		.byte	0x4b
+ 507 0218 EA010000 		.4byte	0x1ea
+ 508 021c 01       		.uleb128 0x1
+ 509 021d 51       		.byte	0x51
+ 510 021e 0D       		.uleb128 0xd
+ 511 021f 76020000 		.4byte	.LASF29
+ 512 0223 01       		.byte	0x1
+ 513 0224 4D       		.byte	0x4d
+ 514 0225 EA010000 		.4byte	0x1ea
+ 515 0229 00000000 		.4byte	.LLST0
+ 516 022d 00       		.byte	0
+ 517 022e 0A       		.uleb128 0xa
+ 518 022f EB020000 		.4byte	.LASF38
+ 519 0233 01       		.byte	0x1
+ 520 0234 68       		.byte	0x68
+ 521 0235 00000000 		.4byte	.LFB35
+ 522 0239 30000000 		.4byte	.LFE35-.LFB35
+ 523 023d 01       		.uleb128 0x1
+ 524 023e 9C       		.byte	0x9c
+ 525 023f 7C020000 		.4byte	0x27c
+ 526 0243 0B       		.uleb128 0xb
+ 527 0244 C3020000 		.4byte	.LASF34
+ 528 0248 01       		.byte	0x1
+ 529 0249 68       		.byte	0x68
+ 530 024a C2010000 		.4byte	0x1c2
+ 531 024e 01       		.uleb128 0x1
+ 532 024f 50       		.byte	0x50
+ 533 0250 0B       		.uleb128 0xb
+ 534 0251 DD020000 		.4byte	.LASF37
+ 535 0255 01       		.byte	0x1
+ 536 0256 68       		.byte	0x68
+ 537 0257 EA010000 		.4byte	0x1ea
+ 538 025b 01       		.uleb128 0x1
+ 539 025c 51       		.byte	0x51
+ 540 025d 0D       		.uleb128 0xd
+ 541 025e 61020000 		.4byte	.LASF39
+ 542 0262 01       		.byte	0x1
+ 543 0263 6A       		.byte	0x6a
+ 544 0264 88010000 		.4byte	0x188
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 14
+
+
+ 545 0268 13000000 		.4byte	.LLST1
+ 546 026c 0D       		.uleb128 0xd
+ 547 026d 25010000 		.4byte	.LASF40
+ 548 0271 01       		.byte	0x1
+ 549 0272 6B       		.byte	0x6b
+ 550 0273 7C020000 		.4byte	0x27c
+ 551 0277 31000000 		.4byte	.LLST2
+ 552 027b 00       		.byte	0
+ 553 027c 0C       		.uleb128 0xc
+ 554 027d B1000000 		.4byte	0xb1
+ 555 0281 0E       		.uleb128 0xe
+ 556 0282 D0020000 		.4byte	.LASF41
+ 557 0286 01       		.byte	0x1
+ 558 0287 AB       		.byte	0xab
+ 559 0288 A6000000 		.4byte	0xa6
+ 560 028c 00000000 		.4byte	.LFB36
+ 561 0290 26000000 		.4byte	.LFE36-.LFB36
+ 562 0294 01       		.uleb128 0x1
+ 563 0295 9C       		.byte	0x9c
+ 564 0296 0F       		.uleb128 0xf
+ 565 0297 7E000000 		.4byte	.LASF42
+ 566 029b 01       		.byte	0x1
+ 567 029c AB       		.byte	0xab
+ 568 029d EA010000 		.4byte	0x1ea
+ 569 02a1 44000000 		.4byte	.LLST3
+ 570 02a5 10       		.uleb128 0x10
+ 571 02a6 C3020000 		.4byte	.LASF34
+ 572 02aa 01       		.byte	0x1
+ 573 02ab AF       		.byte	0xaf
+ 574 02ac C2010000 		.4byte	0x1c2
+ 575 02b0 01       		.uleb128 0x1
+ 576 02b1 53       		.byte	0x53
+ 577 02b2 00       		.byte	0
+ 578 02b3 00       		.byte	0
+ 579              		.section	.debug_abbrev,"",%progbits
+ 580              	.Ldebug_abbrev0:
+ 581 0000 01       		.uleb128 0x1
+ 582 0001 11       		.uleb128 0x11
+ 583 0002 01       		.byte	0x1
+ 584 0003 25       		.uleb128 0x25
+ 585 0004 0E       		.uleb128 0xe
+ 586 0005 13       		.uleb128 0x13
+ 587 0006 0B       		.uleb128 0xb
+ 588 0007 03       		.uleb128 0x3
+ 589 0008 0E       		.uleb128 0xe
+ 590 0009 1B       		.uleb128 0x1b
+ 591 000a 0E       		.uleb128 0xe
+ 592 000b 55       		.uleb128 0x55
+ 593 000c 17       		.uleb128 0x17
+ 594 000d 11       		.uleb128 0x11
+ 595 000e 01       		.uleb128 0x1
+ 596 000f 10       		.uleb128 0x10
+ 597 0010 17       		.uleb128 0x17
+ 598 0011 00       		.byte	0
+ 599 0012 00       		.byte	0
+ 600 0013 02       		.uleb128 0x2
+ 601 0014 24       		.uleb128 0x24
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 15
+
+
+ 602 0015 00       		.byte	0
+ 603 0016 0B       		.uleb128 0xb
+ 604 0017 0B       		.uleb128 0xb
+ 605 0018 3E       		.uleb128 0x3e
+ 606 0019 0B       		.uleb128 0xb
+ 607 001a 03       		.uleb128 0x3
+ 608 001b 0E       		.uleb128 0xe
+ 609 001c 00       		.byte	0
+ 610 001d 00       		.byte	0
+ 611 001e 03       		.uleb128 0x3
+ 612 001f 24       		.uleb128 0x24
+ 613 0020 00       		.byte	0
+ 614 0021 0B       		.uleb128 0xb
+ 615 0022 0B       		.uleb128 0xb
+ 616 0023 3E       		.uleb128 0x3e
+ 617 0024 0B       		.uleb128 0xb
+ 618 0025 03       		.uleb128 0x3
+ 619 0026 08       		.uleb128 0x8
+ 620 0027 00       		.byte	0
+ 621 0028 00       		.byte	0
+ 622 0029 04       		.uleb128 0x4
+ 623 002a 16       		.uleb128 0x16
+ 624 002b 00       		.byte	0
+ 625 002c 03       		.uleb128 0x3
+ 626 002d 0E       		.uleb128 0xe
+ 627 002e 3A       		.uleb128 0x3a
+ 628 002f 0B       		.uleb128 0xb
+ 629 0030 3B       		.uleb128 0x3b
+ 630 0031 0B       		.uleb128 0xb
+ 631 0032 49       		.uleb128 0x49
+ 632 0033 13       		.uleb128 0x13
+ 633 0034 00       		.byte	0
+ 634 0035 00       		.byte	0
+ 635 0036 05       		.uleb128 0x5
+ 636 0037 0F       		.uleb128 0xf
+ 637 0038 00       		.byte	0
+ 638 0039 0B       		.uleb128 0xb
+ 639 003a 0B       		.uleb128 0xb
+ 640 003b 00       		.byte	0
+ 641 003c 00       		.byte	0
+ 642 003d 06       		.uleb128 0x6
+ 643 003e 13       		.uleb128 0x13
+ 644 003f 01       		.byte	0x1
+ 645 0040 03       		.uleb128 0x3
+ 646 0041 0E       		.uleb128 0xe
+ 647 0042 0B       		.uleb128 0xb
+ 648 0043 0B       		.uleb128 0xb
+ 649 0044 3A       		.uleb128 0x3a
+ 650 0045 0B       		.uleb128 0xb
+ 651 0046 3B       		.uleb128 0x3b
+ 652 0047 0B       		.uleb128 0xb
+ 653 0048 01       		.uleb128 0x1
+ 654 0049 13       		.uleb128 0x13
+ 655 004a 00       		.byte	0
+ 656 004b 00       		.byte	0
+ 657 004c 07       		.uleb128 0x7
+ 658 004d 0D       		.uleb128 0xd
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 16
+
+
+ 659 004e 00       		.byte	0
+ 660 004f 03       		.uleb128 0x3
+ 661 0050 0E       		.uleb128 0xe
+ 662 0051 3A       		.uleb128 0x3a
+ 663 0052 0B       		.uleb128 0xb
+ 664 0053 3B       		.uleb128 0x3b
+ 665 0054 0B       		.uleb128 0xb
+ 666 0055 49       		.uleb128 0x49
+ 667 0056 13       		.uleb128 0x13
+ 668 0057 38       		.uleb128 0x38
+ 669 0058 0B       		.uleb128 0xb
+ 670 0059 00       		.byte	0
+ 671 005a 00       		.byte	0
+ 672 005b 08       		.uleb128 0x8
+ 673 005c 0F       		.uleb128 0xf
+ 674 005d 00       		.byte	0
+ 675 005e 0B       		.uleb128 0xb
+ 676 005f 0B       		.uleb128 0xb
+ 677 0060 49       		.uleb128 0x49
+ 678 0061 13       		.uleb128 0x13
+ 679 0062 00       		.byte	0
+ 680 0063 00       		.byte	0
+ 681 0064 09       		.uleb128 0x9
+ 682 0065 35       		.uleb128 0x35
+ 683 0066 00       		.byte	0
+ 684 0067 49       		.uleb128 0x49
+ 685 0068 13       		.uleb128 0x13
+ 686 0069 00       		.byte	0
+ 687 006a 00       		.byte	0
+ 688 006b 0A       		.uleb128 0xa
+ 689 006c 2E       		.uleb128 0x2e
+ 690 006d 01       		.byte	0x1
+ 691 006e 3F       		.uleb128 0x3f
+ 692 006f 19       		.uleb128 0x19
+ 693 0070 03       		.uleb128 0x3
+ 694 0071 0E       		.uleb128 0xe
+ 695 0072 3A       		.uleb128 0x3a
+ 696 0073 0B       		.uleb128 0xb
+ 697 0074 3B       		.uleb128 0x3b
+ 698 0075 0B       		.uleb128 0xb
+ 699 0076 27       		.uleb128 0x27
+ 700 0077 19       		.uleb128 0x19
+ 701 0078 11       		.uleb128 0x11
+ 702 0079 01       		.uleb128 0x1
+ 703 007a 12       		.uleb128 0x12
+ 704 007b 06       		.uleb128 0x6
+ 705 007c 40       		.uleb128 0x40
+ 706 007d 18       		.uleb128 0x18
+ 707 007e 9742     		.uleb128 0x2117
+ 708 0080 19       		.uleb128 0x19
+ 709 0081 01       		.uleb128 0x1
+ 710 0082 13       		.uleb128 0x13
+ 711 0083 00       		.byte	0
+ 712 0084 00       		.byte	0
+ 713 0085 0B       		.uleb128 0xb
+ 714 0086 05       		.uleb128 0x5
+ 715 0087 00       		.byte	0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 17
+
+
+ 716 0088 03       		.uleb128 0x3
+ 717 0089 0E       		.uleb128 0xe
+ 718 008a 3A       		.uleb128 0x3a
+ 719 008b 0B       		.uleb128 0xb
+ 720 008c 3B       		.uleb128 0x3b
+ 721 008d 0B       		.uleb128 0xb
+ 722 008e 49       		.uleb128 0x49
+ 723 008f 13       		.uleb128 0x13
+ 724 0090 02       		.uleb128 0x2
+ 725 0091 18       		.uleb128 0x18
+ 726 0092 00       		.byte	0
+ 727 0093 00       		.byte	0
+ 728 0094 0C       		.uleb128 0xc
+ 729 0095 26       		.uleb128 0x26
+ 730 0096 00       		.byte	0
+ 731 0097 49       		.uleb128 0x49
+ 732 0098 13       		.uleb128 0x13
+ 733 0099 00       		.byte	0
+ 734 009a 00       		.byte	0
+ 735 009b 0D       		.uleb128 0xd
+ 736 009c 34       		.uleb128 0x34
+ 737 009d 00       		.byte	0
+ 738 009e 03       		.uleb128 0x3
+ 739 009f 0E       		.uleb128 0xe
+ 740 00a0 3A       		.uleb128 0x3a
+ 741 00a1 0B       		.uleb128 0xb
+ 742 00a2 3B       		.uleb128 0x3b
+ 743 00a3 0B       		.uleb128 0xb
+ 744 00a4 49       		.uleb128 0x49
+ 745 00a5 13       		.uleb128 0x13
+ 746 00a6 02       		.uleb128 0x2
+ 747 00a7 17       		.uleb128 0x17
+ 748 00a8 00       		.byte	0
+ 749 00a9 00       		.byte	0
+ 750 00aa 0E       		.uleb128 0xe
+ 751 00ab 2E       		.uleb128 0x2e
+ 752 00ac 01       		.byte	0x1
+ 753 00ad 3F       		.uleb128 0x3f
+ 754 00ae 19       		.uleb128 0x19
+ 755 00af 03       		.uleb128 0x3
+ 756 00b0 0E       		.uleb128 0xe
+ 757 00b1 3A       		.uleb128 0x3a
+ 758 00b2 0B       		.uleb128 0xb
+ 759 00b3 3B       		.uleb128 0x3b
+ 760 00b4 0B       		.uleb128 0xb
+ 761 00b5 27       		.uleb128 0x27
+ 762 00b6 19       		.uleb128 0x19
+ 763 00b7 49       		.uleb128 0x49
+ 764 00b8 13       		.uleb128 0x13
+ 765 00b9 11       		.uleb128 0x11
+ 766 00ba 01       		.uleb128 0x1
+ 767 00bb 12       		.uleb128 0x12
+ 768 00bc 06       		.uleb128 0x6
+ 769 00bd 40       		.uleb128 0x40
+ 770 00be 18       		.uleb128 0x18
+ 771 00bf 9742     		.uleb128 0x2117
+ 772 00c1 19       		.uleb128 0x19
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 18
+
+
+ 773 00c2 00       		.byte	0
+ 774 00c3 00       		.byte	0
+ 775 00c4 0F       		.uleb128 0xf
+ 776 00c5 05       		.uleb128 0x5
+ 777 00c6 00       		.byte	0
+ 778 00c7 03       		.uleb128 0x3
+ 779 00c8 0E       		.uleb128 0xe
+ 780 00c9 3A       		.uleb128 0x3a
+ 781 00ca 0B       		.uleb128 0xb
+ 782 00cb 3B       		.uleb128 0x3b
+ 783 00cc 0B       		.uleb128 0xb
+ 784 00cd 49       		.uleb128 0x49
+ 785 00ce 13       		.uleb128 0x13
+ 786 00cf 02       		.uleb128 0x2
+ 787 00d0 17       		.uleb128 0x17
+ 788 00d1 00       		.byte	0
+ 789 00d2 00       		.byte	0
+ 790 00d3 10       		.uleb128 0x10
+ 791 00d4 34       		.uleb128 0x34
+ 792 00d5 00       		.byte	0
+ 793 00d6 03       		.uleb128 0x3
+ 794 00d7 0E       		.uleb128 0xe
+ 795 00d8 3A       		.uleb128 0x3a
+ 796 00d9 0B       		.uleb128 0xb
+ 797 00da 3B       		.uleb128 0x3b
+ 798 00db 0B       		.uleb128 0xb
+ 799 00dc 49       		.uleb128 0x49
+ 800 00dd 13       		.uleb128 0x13
+ 801 00de 02       		.uleb128 0x2
+ 802 00df 18       		.uleb128 0x18
+ 803 00e0 00       		.byte	0
+ 804 00e1 00       		.byte	0
+ 805 00e2 00       		.byte	0
+ 806              		.section	.debug_loc,"",%progbits
+ 807              	.Ldebug_loc0:
+ 808              	.LLST0:
+ 809 0000 02000000 		.4byte	.LVL3
+ 810 0004 12000000 		.4byte	.LVL4
+ 811 0008 0100     		.2byte	0x1
+ 812 000a 53       		.byte	0x53
+ 813 000b 00000000 		.4byte	0
+ 814 000f 00000000 		.4byte	0
+ 815              	.LLST1:
+ 816 0013 0A000000 		.4byte	.LVL7
+ 817 0017 0C000000 		.4byte	.LVL8
+ 818 001b 0100     		.2byte	0x1
+ 819 001d 52       		.byte	0x52
+ 820 001e 10000000 		.4byte	.LVL9
+ 821 0022 30000000 		.4byte	.LFE35
+ 822 0026 0100     		.2byte	0x1
+ 823 0028 52       		.byte	0x52
+ 824 0029 00000000 		.4byte	0
+ 825 002d 00000000 		.4byte	0
+ 826              	.LLST2:
+ 827 0031 04000000 		.4byte	.LVL6
+ 828 0035 2E000000 		.4byte	.LVL11
+ 829 0039 0100     		.2byte	0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 19
+
+
+ 830 003b 54       		.byte	0x54
+ 831 003c 00000000 		.4byte	0
+ 832 0040 00000000 		.4byte	0
+ 833              	.LLST3:
+ 834 0044 00000000 		.4byte	.LVL12
+ 835 0048 24000000 		.4byte	.LVL14
+ 836 004c 0100     		.2byte	0x1
+ 837 004e 50       		.byte	0x50
+ 838 004f 24000000 		.4byte	.LVL14
+ 839 0053 26000000 		.4byte	.LFE36
+ 840 0057 0400     		.2byte	0x4
+ 841 0059 F3       		.byte	0xf3
+ 842 005a 01       		.uleb128 0x1
+ 843 005b 50       		.byte	0x50
+ 844 005c 9F       		.byte	0x9f
+ 845 005d 00000000 		.4byte	0
+ 846 0061 00000000 		.4byte	0
+ 847              		.section	.debug_aranges,"",%progbits
+ 848 0000 3C000000 		.4byte	0x3c
+ 849 0004 0200     		.2byte	0x2
+ 850 0006 00000000 		.4byte	.Ldebug_info0
+ 851 000a 04       		.byte	0x4
+ 852 000b 00       		.byte	0
+ 853 000c 0000     		.2byte	0
+ 854 000e 0000     		.2byte	0
+ 855 0010 00000000 		.4byte	.LFB32
+ 856 0014 16000000 		.4byte	.LFE32-.LFB32
+ 857 0018 00000000 		.4byte	.LFB33
+ 858 001c 06000000 		.4byte	.LFE33-.LFB33
+ 859 0020 00000000 		.4byte	.LFB34
+ 860 0024 18000000 		.4byte	.LFE34-.LFB34
+ 861 0028 00000000 		.4byte	.LFB35
+ 862 002c 30000000 		.4byte	.LFE35-.LFB35
+ 863 0030 00000000 		.4byte	.LFB36
+ 864 0034 26000000 		.4byte	.LFE36-.LFB36
+ 865 0038 00000000 		.4byte	0
+ 866 003c 00000000 		.4byte	0
+ 867              		.section	.debug_ranges,"",%progbits
+ 868              	.Ldebug_ranges0:
+ 869 0000 00000000 		.4byte	.LFB32
+ 870 0004 16000000 		.4byte	.LFE32
+ 871 0008 00000000 		.4byte	.LFB33
+ 872 000c 06000000 		.4byte	.LFE33
+ 873 0010 00000000 		.4byte	.LFB34
+ 874 0014 18000000 		.4byte	.LFE34
+ 875 0018 00000000 		.4byte	.LFB35
+ 876 001c 30000000 		.4byte	.LFE35
+ 877 0020 00000000 		.4byte	.LFB36
+ 878 0024 26000000 		.4byte	.LFE36
+ 879 0028 00000000 		.4byte	0
+ 880 002c 00000000 		.4byte	0
+ 881              		.section	.debug_line,"",%progbits
+ 882              	.Ldebug_line0:
+ 883 0000 FF010000 		.section	.debug_str,"MS",%progbits,1
+ 883      02007A01 
+ 883      00000201 
+ 883      FB0E0D00 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 20
+
+
+ 883      01010101 
+ 884              	.LASF21:
+ 885 0000 70764F77 		.ascii	"pvOwner\000"
+ 885      6E657200 
+ 886              	.LASF23:
+ 887 0008 4C697374 		.ascii	"ListItem_t\000"
+ 887      4974656D 
+ 887      5F7400
+ 888              	.LASF17:
+ 889 0013 5469636B 		.ascii	"TickType_t\000"
+ 889      54797065 
+ 889      5F7400
+ 890              	.LASF26:
+ 891 001e 4D696E69 		.ascii	"MiniListItem_t\000"
+ 891      4C697374 
+ 891      4974656D 
+ 891      5F7400
+ 892              	.LASF18:
+ 893 002d 78497465 		.ascii	"xItemValue\000"
+ 893      6D56616C 
+ 893      756500
+ 894              	.LASF30:
+ 895 0038 784C6973 		.ascii	"xListEnd\000"
+ 895      74456E64 
+ 895      00
+ 896              	.LASF22:
+ 897 0041 7076436F 		.ascii	"pvContainer\000"
+ 897      6E746169 
+ 897      6E657200 
+ 898              	.LASF24:
+ 899 004d 784C4953 		.ascii	"xLIST_ITEM\000"
+ 899      545F4954 
+ 899      454D00
+ 900              	.LASF14:
+ 901 0058 666C6F61 		.ascii	"float\000"
+ 901      7400
+ 902              	.LASF4:
+ 903 005e 756E7369 		.ascii	"unsigned char\000"
+ 903      676E6564 
+ 903      20636861 
+ 903      7200
+ 904              	.LASF8:
+ 905 006c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 905      20756E73 
+ 905      69676E65 
+ 905      6420696E 
+ 905      7400
+ 906              	.LASF42:
+ 907 007e 70784974 		.ascii	"pxItemToRemove\000"
+ 907      656D546F 
+ 907      52656D6F 
+ 907      766500
+ 908              	.LASF6:
+ 909 008d 73686F72 		.ascii	"short unsigned int\000"
+ 909      7420756E 
+ 909      7369676E 
+ 909      65642069 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 21
+
+
+ 909      6E7400
+ 910              	.LASF33:
+ 911 00a0 764C6973 		.ascii	"vListInitialiseItem\000"
+ 911      74496E69 
+ 911      7469616C 
+ 911      69736549 
+ 911      74656D00 
+ 912              	.LASF31:
+ 913 00b4 4C697374 		.ascii	"List_t\000"
+ 913      5F7400
+ 914              	.LASF15:
+ 915 00bb 646F7562 		.ascii	"double\000"
+ 915      6C6500
+ 916              	.LASF12:
+ 917 00c2 5F5F7569 		.ascii	"__uint32_t\000"
+ 917      6E743332 
+ 917      5F7400
+ 918              	.LASF44:
+ 919 00cd 2E2E5C46 		.ascii	"..\\FreeRTOS10\\list.c\000"
+ 919      72656552 
+ 919      544F5331 
+ 919      305C6C69 
+ 919      73742E63 
+ 920              	.LASF28:
+ 921 00e2 75784E75 		.ascii	"uxNumberOfItems\000"
+ 921      6D626572 
+ 921      4F664974 
+ 921      656D7300 
+ 922              	.LASF36:
+ 923 00f2 764C6973 		.ascii	"vListInsertEnd\000"
+ 923      74496E73 
+ 923      65727445 
+ 923      6E6400
+ 924              	.LASF19:
+ 925 0101 70784E65 		.ascii	"pxNext\000"
+ 925      787400
+ 926              	.LASF0:
+ 927 0108 756E7369 		.ascii	"unsigned int\000"
+ 927      676E6564 
+ 927      20696E74 
+ 927      00
+ 928              	.LASF32:
+ 929 0115 764C6973 		.ascii	"vListInitialise\000"
+ 929      74496E69 
+ 929      7469616C 
+ 929      69736500 
+ 930              	.LASF40:
+ 931 0125 7856616C 		.ascii	"xValueOfInsertion\000"
+ 931      75654F66 
+ 931      496E7365 
+ 931      7274696F 
+ 931      6E00
+ 932              	.LASF9:
+ 933 0137 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 933      206C6F6E 
+ 933      6720756E 
+ 933      7369676E 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 22
+
+
+ 933      65642069 
+ 934              	.LASF35:
+ 935 014e 70784974 		.ascii	"pxItem\000"
+ 935      656D00
+ 936              	.LASF16:
+ 937 0155 55426173 		.ascii	"UBaseType_t\000"
+ 937      65547970 
+ 937      655F7400 
+ 938              	.LASF43:
+ 939 0161 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 939      43313120 
+ 939      352E342E 
+ 939      31203230 
+ 939      31363036 
+ 940 0194 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 940      20726576 
+ 940      6973696F 
+ 940      6E203233 
+ 940      37373135 
+ 941 01c7 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 941      66756E63 
+ 941      74696F6E 
+ 941      2D736563 
+ 941      74696F6E 
+ 942              	.LASF10:
+ 943 01ef 73697A65 		.ascii	"sizetype\000"
+ 943      74797065 
+ 943      00
+ 944              	.LASF1:
+ 945 01f8 6C6F6E67 		.ascii	"long long int\000"
+ 945      206C6F6E 
+ 945      6720696E 
+ 945      7400
+ 946              	.LASF11:
+ 947 0206 63686172 		.ascii	"char\000"
+ 947      00
+ 948              	.LASF45:
+ 949 020b 433A5C55 		.ascii	"C:\\Users\\Xwx47\\Documents\\Creator\\FreeRTOS_49-4"
+ 949      73657273 
+ 949      5C587778 
+ 949      34375C44 
+ 949      6F63756D 
+ 950 0239 3278785C 		.ascii	"2xx\\UART_MessageBuffer_FreeRTOS10.cydsn\000"
+ 950      55415254 
+ 950      5F4D6573 
+ 950      73616765 
+ 950      42756666 
+ 951              	.LASF39:
+ 952 0261 70784974 		.ascii	"pxIterator\000"
+ 952      65726174 
+ 952      6F7200
+ 953              	.LASF5:
+ 954 026c 73686F72 		.ascii	"short int\000"
+ 954      7420696E 
+ 954      7400
+ 955              	.LASF29:
+ 956 0276 7078496E 		.ascii	"pxIndex\000"
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccqT5sZe.s 			page 23
+
+
+ 956      64657800 
+ 957              	.LASF20:
+ 958 027e 70785072 		.ascii	"pxPrevious\000"
+ 958      6576696F 
+ 958      757300
+ 959              	.LASF13:
+ 960 0289 75696E74 		.ascii	"uint32_t\000"
+ 960      33325F74 
+ 960      00
+ 961              	.LASF7:
+ 962 0292 6C6F6E67 		.ascii	"long int\000"
+ 962      20696E74 
+ 962      00
+ 963              	.LASF2:
+ 964 029b 6C6F6E67 		.ascii	"long double\000"
+ 964      20646F75 
+ 964      626C6500 
+ 965              	.LASF25:
+ 966 02a7 784D494E 		.ascii	"xMINI_LIST_ITEM\000"
+ 966      495F4C49 
+ 966      53545F49 
+ 966      54454D00 
+ 967              	.LASF3:
+ 968 02b7 7369676E 		.ascii	"signed char\000"
+ 968      65642063 
+ 968      68617200 
+ 969              	.LASF34:
+ 970 02c3 70784C69 		.ascii	"pxList\000"
+ 970      737400
+ 971              	.LASF27:
+ 972 02ca 784C4953 		.ascii	"xLIST\000"
+ 972      5400
+ 973              	.LASF41:
+ 974 02d0 75784C69 		.ascii	"uxListRemove\000"
+ 974      73745265 
+ 974      6D6F7665 
+ 974      00
+ 975              	.LASF37:
+ 976 02dd 70784E65 		.ascii	"pxNewListItem\000"
+ 976      774C6973 
+ 976      74497465 
+ 976      6D00
+ 977              	.LASF38:
+ 978 02eb 764C6973 		.ascii	"vListInsert\000"
+ 978      74496E73 
+ 978      65727400 
+ 979              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

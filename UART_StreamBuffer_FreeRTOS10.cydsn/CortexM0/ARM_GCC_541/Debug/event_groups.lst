@@ -1,0 +1,4526 @@
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"event_groups.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.prvTestWaitCondition,"ax",%progbits
+  20              		.align	2
+  21              		.code	16
+  22              		.thumb_func
+  23              		.type	prvTestWaitCondition, %function
+  24              	prvTestWaitCondition:
+  25              	.LFB41:
+  26              		.file 1 "..\\FreeRTOS10\\event_groups.c"
+   1:..\FreeRTOS10/event_groups.c **** /*
+   2:..\FreeRTOS10/event_groups.c ****  * FreeRTOS Kernel V10.0.0
+   3:..\FreeRTOS10/event_groups.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\FreeRTOS10/event_groups.c ****  *
+   5:..\FreeRTOS10/event_groups.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\FreeRTOS10/event_groups.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\FreeRTOS10/event_groups.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\FreeRTOS10/event_groups.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\FreeRTOS10/event_groups.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\FreeRTOS10/event_groups.c ****  * subject to the following conditions:
+  11:..\FreeRTOS10/event_groups.c ****  *
+  12:..\FreeRTOS10/event_groups.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\FreeRTOS10/event_groups.c ****  * copies or substantial portions of the Software. If you wish to use our Amazon
+  14:..\FreeRTOS10/event_groups.c ****  * FreeRTOS name, please do so in a fair use way that does not cause confusion.
+  15:..\FreeRTOS10/event_groups.c ****  *
+  16:..\FreeRTOS10/event_groups.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  17:..\FreeRTOS10/event_groups.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  18:..\FreeRTOS10/event_groups.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  19:..\FreeRTOS10/event_groups.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  20:..\FreeRTOS10/event_groups.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  21:..\FreeRTOS10/event_groups.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  22:..\FreeRTOS10/event_groups.c ****  *
+  23:..\FreeRTOS10/event_groups.c ****  * http://www.FreeRTOS.org
+  24:..\FreeRTOS10/event_groups.c ****  * http://aws.amazon.com/freertos
+  25:..\FreeRTOS10/event_groups.c ****  *
+  26:..\FreeRTOS10/event_groups.c ****  * 1 tab == 4 spaces!
+  27:..\FreeRTOS10/event_groups.c ****  */
+  28:..\FreeRTOS10/event_groups.c **** 
+  29:..\FreeRTOS10/event_groups.c **** /* Standard includes. */
+  30:..\FreeRTOS10/event_groups.c **** #include <stdlib.h>
+  31:..\FreeRTOS10/event_groups.c **** 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 2
+
+
+  32:..\FreeRTOS10/event_groups.c **** /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
+  33:..\FreeRTOS10/event_groups.c **** all the API functions to use the MPU wrappers.  That should only be done when
+  34:..\FreeRTOS10/event_groups.c **** task.h is included from an application file. */
+  35:..\FreeRTOS10/event_groups.c **** #define MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+  36:..\FreeRTOS10/event_groups.c **** 
+  37:..\FreeRTOS10/event_groups.c **** /* FreeRTOS includes. */
+  38:..\FreeRTOS10/event_groups.c **** #include "FreeRTOS.h"
+  39:..\FreeRTOS10/event_groups.c **** #include "task.h"
+  40:..\FreeRTOS10/event_groups.c **** #include "timers.h"
+  41:..\FreeRTOS10/event_groups.c **** #include "event_groups.h"
+  42:..\FreeRTOS10/event_groups.c **** 
+  43:..\FreeRTOS10/event_groups.c **** /* Lint e961 and e750 are suppressed as a MISRA exception justified because the
+  44:..\FreeRTOS10/event_groups.c **** MPU ports require MPU_WRAPPERS_INCLUDED_FROM_API_FILE to be defined for the
+  45:..\FreeRTOS10/event_groups.c **** header files above, but not in this file, in order to generate the correct
+  46:..\FreeRTOS10/event_groups.c **** privileged Vs unprivileged linkage and placement. */
+  47:..\FreeRTOS10/event_groups.c **** #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE /*lint !e961 !e750. */
+  48:..\FreeRTOS10/event_groups.c **** 
+  49:..\FreeRTOS10/event_groups.c **** /* The following bit fields convey control information in a task's event list
+  50:..\FreeRTOS10/event_groups.c **** item value.  It is important they don't clash with the
+  51:..\FreeRTOS10/event_groups.c **** taskEVENT_LIST_ITEM_VALUE_IN_USE definition. */
+  52:..\FreeRTOS10/event_groups.c **** #if configUSE_16_BIT_TICKS == 1
+  53:..\FreeRTOS10/event_groups.c **** 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x0100U
+  54:..\FreeRTOS10/event_groups.c **** 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x0200U
+  55:..\FreeRTOS10/event_groups.c **** 	#define eventWAIT_FOR_ALL_BITS			0x0400U
+  56:..\FreeRTOS10/event_groups.c **** 	#define eventEVENT_BITS_CONTROL_BYTES	0xff00U
+  57:..\FreeRTOS10/event_groups.c **** #else
+  58:..\FreeRTOS10/event_groups.c **** 	#define eventCLEAR_EVENTS_ON_EXIT_BIT	0x01000000UL
+  59:..\FreeRTOS10/event_groups.c **** 	#define eventUNBLOCKED_DUE_TO_BIT_SET	0x02000000UL
+  60:..\FreeRTOS10/event_groups.c **** 	#define eventWAIT_FOR_ALL_BITS			0x04000000UL
+  61:..\FreeRTOS10/event_groups.c **** 	#define eventEVENT_BITS_CONTROL_BYTES	0xff000000UL
+  62:..\FreeRTOS10/event_groups.c **** #endif
+  63:..\FreeRTOS10/event_groups.c **** 
+  64:..\FreeRTOS10/event_groups.c **** typedef struct xEventGroupDefinition
+  65:..\FreeRTOS10/event_groups.c **** {
+  66:..\FreeRTOS10/event_groups.c **** 	EventBits_t uxEventBits;
+  67:..\FreeRTOS10/event_groups.c **** 	List_t xTasksWaitingForBits;		/*< List of tasks waiting for a bit to be set. */
+  68:..\FreeRTOS10/event_groups.c **** 
+  69:..\FreeRTOS10/event_groups.c **** 	#if( configUSE_TRACE_FACILITY == 1 )
+  70:..\FreeRTOS10/event_groups.c **** 		UBaseType_t uxEventGroupNumber;
+  71:..\FreeRTOS10/event_groups.c **** 	#endif
+  72:..\FreeRTOS10/event_groups.c **** 
+  73:..\FreeRTOS10/event_groups.c **** 	#if( ( configSUPPORT_STATIC_ALLOCATION == 1 ) && ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) )
+  74:..\FreeRTOS10/event_groups.c **** 		uint8_t ucStaticallyAllocated; /*< Set to pdTRUE if the event group is statically allocated to en
+  75:..\FreeRTOS10/event_groups.c **** 	#endif
+  76:..\FreeRTOS10/event_groups.c **** } EventGroup_t;
+  77:..\FreeRTOS10/event_groups.c **** 
+  78:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+  79:..\FreeRTOS10/event_groups.c **** 
+  80:..\FreeRTOS10/event_groups.c **** /*
+  81:..\FreeRTOS10/event_groups.c ****  * Test the bits set in uxCurrentEventBits to see if the wait condition is met.
+  82:..\FreeRTOS10/event_groups.c ****  * The wait condition is defined by xWaitForAllBits.  If xWaitForAllBits is
+  83:..\FreeRTOS10/event_groups.c ****  * pdTRUE then the wait condition is met if all the bits set in uxBitsToWaitFor
+  84:..\FreeRTOS10/event_groups.c ****  * are also set in uxCurrentEventBits.  If xWaitForAllBits is pdFALSE then the
+  85:..\FreeRTOS10/event_groups.c ****  * wait condition is met if any of the bits set in uxBitsToWait for are also set
+  86:..\FreeRTOS10/event_groups.c ****  * in uxCurrentEventBits.
+  87:..\FreeRTOS10/event_groups.c ****  */
+  88:..\FreeRTOS10/event_groups.c **** static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxB
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 3
+
+
+  89:..\FreeRTOS10/event_groups.c **** 
+  90:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+  91:..\FreeRTOS10/event_groups.c **** 
+  92:..\FreeRTOS10/event_groups.c **** #if( configSUPPORT_STATIC_ALLOCATION == 1 )
+  93:..\FreeRTOS10/event_groups.c **** 
+  94:..\FreeRTOS10/event_groups.c **** 	EventGroupHandle_t xEventGroupCreateStatic( StaticEventGroup_t *pxEventGroupBuffer )
+  95:..\FreeRTOS10/event_groups.c **** 	{
+  96:..\FreeRTOS10/event_groups.c **** 	EventGroup_t *pxEventBits;
+  97:..\FreeRTOS10/event_groups.c **** 
+  98:..\FreeRTOS10/event_groups.c **** 		/* A StaticEventGroup_t object must be provided. */
+  99:..\FreeRTOS10/event_groups.c **** 		configASSERT( pxEventGroupBuffer );
+ 100:..\FreeRTOS10/event_groups.c **** 
+ 101:..\FreeRTOS10/event_groups.c **** 		#if( configASSERT_DEFINED == 1 )
+ 102:..\FreeRTOS10/event_groups.c **** 		{
+ 103:..\FreeRTOS10/event_groups.c **** 			/* Sanity check that the size of the structure used to declare a
+ 104:..\FreeRTOS10/event_groups.c **** 			variable of type StaticEventGroup_t equals the size of the real
+ 105:..\FreeRTOS10/event_groups.c **** 			event group structure. */
+ 106:..\FreeRTOS10/event_groups.c **** 			volatile size_t xSize = sizeof( StaticEventGroup_t );
+ 107:..\FreeRTOS10/event_groups.c **** 			configASSERT( xSize == sizeof( EventGroup_t ) );
+ 108:..\FreeRTOS10/event_groups.c **** 		}
+ 109:..\FreeRTOS10/event_groups.c **** 		#endif /* configASSERT_DEFINED */
+ 110:..\FreeRTOS10/event_groups.c **** 
+ 111:..\FreeRTOS10/event_groups.c **** 		/* The user has provided a statically allocated event group - use it. */
+ 112:..\FreeRTOS10/event_groups.c **** 		pxEventBits = ( EventGroup_t * ) pxEventGroupBuffer; /*lint !e740 EventGroup_t and StaticEventGro
+ 113:..\FreeRTOS10/event_groups.c **** 
+ 114:..\FreeRTOS10/event_groups.c **** 		if( pxEventBits != NULL )
+ 115:..\FreeRTOS10/event_groups.c **** 		{
+ 116:..\FreeRTOS10/event_groups.c **** 			pxEventBits->uxEventBits = 0;
+ 117:..\FreeRTOS10/event_groups.c **** 			vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+ 118:..\FreeRTOS10/event_groups.c **** 
+ 119:..\FreeRTOS10/event_groups.c **** 			#if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+ 120:..\FreeRTOS10/event_groups.c **** 			{
+ 121:..\FreeRTOS10/event_groups.c **** 				/* Both static and dynamic allocation can be used, so note that
+ 122:..\FreeRTOS10/event_groups.c **** 				this event group was created statically in case the event group
+ 123:..\FreeRTOS10/event_groups.c **** 				is later deleted. */
+ 124:..\FreeRTOS10/event_groups.c **** 				pxEventBits->ucStaticallyAllocated = pdTRUE;
+ 125:..\FreeRTOS10/event_groups.c **** 			}
+ 126:..\FreeRTOS10/event_groups.c **** 			#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+ 127:..\FreeRTOS10/event_groups.c **** 
+ 128:..\FreeRTOS10/event_groups.c **** 			traceEVENT_GROUP_CREATE( pxEventBits );
+ 129:..\FreeRTOS10/event_groups.c **** 		}
+ 130:..\FreeRTOS10/event_groups.c **** 		else
+ 131:..\FreeRTOS10/event_groups.c **** 		{
+ 132:..\FreeRTOS10/event_groups.c **** 			traceEVENT_GROUP_CREATE_FAILED();
+ 133:..\FreeRTOS10/event_groups.c **** 		}
+ 134:..\FreeRTOS10/event_groups.c **** 
+ 135:..\FreeRTOS10/event_groups.c **** 		return ( EventGroupHandle_t ) pxEventBits;
+ 136:..\FreeRTOS10/event_groups.c **** 	}
+ 137:..\FreeRTOS10/event_groups.c **** 
+ 138:..\FreeRTOS10/event_groups.c **** #endif /* configSUPPORT_STATIC_ALLOCATION */
+ 139:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 140:..\FreeRTOS10/event_groups.c **** 
+ 141:..\FreeRTOS10/event_groups.c **** #if( configSUPPORT_DYNAMIC_ALLOCATION == 1 )
+ 142:..\FreeRTOS10/event_groups.c **** 
+ 143:..\FreeRTOS10/event_groups.c **** 	EventGroupHandle_t xEventGroupCreate( void )
+ 144:..\FreeRTOS10/event_groups.c **** 	{
+ 145:..\FreeRTOS10/event_groups.c **** 	EventGroup_t *pxEventBits;
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 4
+
+
+ 146:..\FreeRTOS10/event_groups.c **** 
+ 147:..\FreeRTOS10/event_groups.c **** 		/* Allocate the event group. */
+ 148:..\FreeRTOS10/event_groups.c **** 		pxEventBits = ( EventGroup_t * ) pvPortMalloc( sizeof( EventGroup_t ) );
+ 149:..\FreeRTOS10/event_groups.c **** 
+ 150:..\FreeRTOS10/event_groups.c **** 		if( pxEventBits != NULL )
+ 151:..\FreeRTOS10/event_groups.c **** 		{
+ 152:..\FreeRTOS10/event_groups.c **** 			pxEventBits->uxEventBits = 0;
+ 153:..\FreeRTOS10/event_groups.c **** 			vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+ 154:..\FreeRTOS10/event_groups.c **** 
+ 155:..\FreeRTOS10/event_groups.c **** 			#if( configSUPPORT_STATIC_ALLOCATION == 1 )
+ 156:..\FreeRTOS10/event_groups.c **** 			{
+ 157:..\FreeRTOS10/event_groups.c **** 				/* Both static and dynamic allocation can be used, so note this
+ 158:..\FreeRTOS10/event_groups.c **** 				event group was allocated statically in case the event group is
+ 159:..\FreeRTOS10/event_groups.c **** 				later deleted. */
+ 160:..\FreeRTOS10/event_groups.c **** 				pxEventBits->ucStaticallyAllocated = pdFALSE;
+ 161:..\FreeRTOS10/event_groups.c **** 			}
+ 162:..\FreeRTOS10/event_groups.c **** 			#endif /* configSUPPORT_STATIC_ALLOCATION */
+ 163:..\FreeRTOS10/event_groups.c **** 
+ 164:..\FreeRTOS10/event_groups.c **** 			traceEVENT_GROUP_CREATE( pxEventBits );
+ 165:..\FreeRTOS10/event_groups.c **** 		}
+ 166:..\FreeRTOS10/event_groups.c **** 		else
+ 167:..\FreeRTOS10/event_groups.c **** 		{
+ 168:..\FreeRTOS10/event_groups.c **** 			traceEVENT_GROUP_CREATE_FAILED();
+ 169:..\FreeRTOS10/event_groups.c **** 		}
+ 170:..\FreeRTOS10/event_groups.c **** 
+ 171:..\FreeRTOS10/event_groups.c **** 		return ( EventGroupHandle_t ) pxEventBits;
+ 172:..\FreeRTOS10/event_groups.c **** 	}
+ 173:..\FreeRTOS10/event_groups.c **** 
+ 174:..\FreeRTOS10/event_groups.c **** #endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+ 175:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 176:..\FreeRTOS10/event_groups.c **** 
+ 177:..\FreeRTOS10/event_groups.c **** EventBits_t xEventGroupSync( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet, const E
+ 178:..\FreeRTOS10/event_groups.c **** {
+ 179:..\FreeRTOS10/event_groups.c **** EventBits_t uxOriginalBitValue, uxReturn;
+ 180:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 181:..\FreeRTOS10/event_groups.c **** BaseType_t xAlreadyYielded;
+ 182:..\FreeRTOS10/event_groups.c **** BaseType_t xTimeoutOccurred = pdFALSE;
+ 183:..\FreeRTOS10/event_groups.c **** 
+ 184:..\FreeRTOS10/event_groups.c **** 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 185:..\FreeRTOS10/event_groups.c **** 	configASSERT( uxBitsToWaitFor != 0 );
+ 186:..\FreeRTOS10/event_groups.c **** 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+ 187:..\FreeRTOS10/event_groups.c **** 	{
+ 188:..\FreeRTOS10/event_groups.c **** 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 )
+ 189:..\FreeRTOS10/event_groups.c **** 	}
+ 190:..\FreeRTOS10/event_groups.c **** 	#endif
+ 191:..\FreeRTOS10/event_groups.c **** 
+ 192:..\FreeRTOS10/event_groups.c **** 	vTaskSuspendAll();
+ 193:..\FreeRTOS10/event_groups.c **** 	{
+ 194:..\FreeRTOS10/event_groups.c **** 		uxOriginalBitValue = pxEventBits->uxEventBits;
+ 195:..\FreeRTOS10/event_groups.c **** 
+ 196:..\FreeRTOS10/event_groups.c **** 		( void ) xEventGroupSetBits( xEventGroup, uxBitsToSet );
+ 197:..\FreeRTOS10/event_groups.c **** 
+ 198:..\FreeRTOS10/event_groups.c **** 		if( ( ( uxOriginalBitValue | uxBitsToSet ) & uxBitsToWaitFor ) == uxBitsToWaitFor )
+ 199:..\FreeRTOS10/event_groups.c **** 		{
+ 200:..\FreeRTOS10/event_groups.c **** 			/* All the rendezvous bits are now set - no need to block. */
+ 201:..\FreeRTOS10/event_groups.c **** 			uxReturn = ( uxOriginalBitValue | uxBitsToSet );
+ 202:..\FreeRTOS10/event_groups.c **** 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 5
+
+
+ 203:..\FreeRTOS10/event_groups.c **** 			/* Rendezvous always clear the bits.  They will have been cleared
+ 204:..\FreeRTOS10/event_groups.c **** 			already unless this is the only task in the rendezvous. */
+ 205:..\FreeRTOS10/event_groups.c **** 			pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 206:..\FreeRTOS10/event_groups.c **** 
+ 207:..\FreeRTOS10/event_groups.c **** 			xTicksToWait = 0;
+ 208:..\FreeRTOS10/event_groups.c **** 		}
+ 209:..\FreeRTOS10/event_groups.c **** 		else
+ 210:..\FreeRTOS10/event_groups.c **** 		{
+ 211:..\FreeRTOS10/event_groups.c **** 			if( xTicksToWait != ( TickType_t ) 0 )
+ 212:..\FreeRTOS10/event_groups.c **** 			{
+ 213:..\FreeRTOS10/event_groups.c **** 				traceEVENT_GROUP_SYNC_BLOCK( xEventGroup, uxBitsToSet, uxBitsToWaitFor );
+ 214:..\FreeRTOS10/event_groups.c **** 
+ 215:..\FreeRTOS10/event_groups.c **** 				/* Store the bits that the calling task is waiting for in the
+ 216:..\FreeRTOS10/event_groups.c **** 				task's event list item so the kernel knows when a match is
+ 217:..\FreeRTOS10/event_groups.c **** 				found.  Then enter the blocked state. */
+ 218:..\FreeRTOS10/event_groups.c **** 				vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | eve
+ 219:..\FreeRTOS10/event_groups.c **** 
+ 220:..\FreeRTOS10/event_groups.c **** 				/* This assignment is obsolete as uxReturn will get set after
+ 221:..\FreeRTOS10/event_groups.c **** 				the task unblocks, but some compilers mistakenly generate a
+ 222:..\FreeRTOS10/event_groups.c **** 				warning about uxReturn being returned without being set if the
+ 223:..\FreeRTOS10/event_groups.c **** 				assignment is omitted. */
+ 224:..\FreeRTOS10/event_groups.c **** 				uxReturn = 0;
+ 225:..\FreeRTOS10/event_groups.c **** 			}
+ 226:..\FreeRTOS10/event_groups.c **** 			else
+ 227:..\FreeRTOS10/event_groups.c **** 			{
+ 228:..\FreeRTOS10/event_groups.c **** 				/* The rendezvous bits were not set, but no block time was
+ 229:..\FreeRTOS10/event_groups.c **** 				specified - just return the current event bit value. */
+ 230:..\FreeRTOS10/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ 231:..\FreeRTOS10/event_groups.c **** 				xTimeoutOccurred = pdTRUE;
+ 232:..\FreeRTOS10/event_groups.c **** 			}
+ 233:..\FreeRTOS10/event_groups.c **** 		}
+ 234:..\FreeRTOS10/event_groups.c **** 	}
+ 235:..\FreeRTOS10/event_groups.c **** 	xAlreadyYielded = xTaskResumeAll();
+ 236:..\FreeRTOS10/event_groups.c **** 
+ 237:..\FreeRTOS10/event_groups.c **** 	if( xTicksToWait != ( TickType_t ) 0 )
+ 238:..\FreeRTOS10/event_groups.c **** 	{
+ 239:..\FreeRTOS10/event_groups.c **** 		if( xAlreadyYielded == pdFALSE )
+ 240:..\FreeRTOS10/event_groups.c **** 		{
+ 241:..\FreeRTOS10/event_groups.c **** 			portYIELD_WITHIN_API();
+ 242:..\FreeRTOS10/event_groups.c **** 		}
+ 243:..\FreeRTOS10/event_groups.c **** 		else
+ 244:..\FreeRTOS10/event_groups.c **** 		{
+ 245:..\FreeRTOS10/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 246:..\FreeRTOS10/event_groups.c **** 		}
+ 247:..\FreeRTOS10/event_groups.c **** 
+ 248:..\FreeRTOS10/event_groups.c **** 		/* The task blocked to wait for its required bits to be set - at this
+ 249:..\FreeRTOS10/event_groups.c **** 		point either the required bits were set or the block time expired.  If
+ 250:..\FreeRTOS10/event_groups.c **** 		the required bits were set they will have been stored in the task's
+ 251:..\FreeRTOS10/event_groups.c **** 		event list item, and they should now be retrieved then cleared. */
+ 252:..\FreeRTOS10/event_groups.c **** 		uxReturn = uxTaskResetEventItemValue();
+ 253:..\FreeRTOS10/event_groups.c **** 
+ 254:..\FreeRTOS10/event_groups.c **** 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+ 255:..\FreeRTOS10/event_groups.c **** 		{
+ 256:..\FreeRTOS10/event_groups.c **** 			/* The task timed out, just return the current event bit value. */
+ 257:..\FreeRTOS10/event_groups.c **** 			taskENTER_CRITICAL();
+ 258:..\FreeRTOS10/event_groups.c **** 			{
+ 259:..\FreeRTOS10/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 6
+
+
+ 260:..\FreeRTOS10/event_groups.c **** 
+ 261:..\FreeRTOS10/event_groups.c **** 				/* Although the task got here because it timed out before the
+ 262:..\FreeRTOS10/event_groups.c **** 				bits it was waiting for were set, it is possible that since it
+ 263:..\FreeRTOS10/event_groups.c **** 				unblocked another task has set the bits.  If this is the case
+ 264:..\FreeRTOS10/event_groups.c **** 				then it needs to clear the bits before exiting. */
+ 265:..\FreeRTOS10/event_groups.c **** 				if( ( uxReturn & uxBitsToWaitFor ) == uxBitsToWaitFor )
+ 266:..\FreeRTOS10/event_groups.c **** 				{
+ 267:..\FreeRTOS10/event_groups.c **** 					pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 268:..\FreeRTOS10/event_groups.c **** 				}
+ 269:..\FreeRTOS10/event_groups.c **** 				else
+ 270:..\FreeRTOS10/event_groups.c **** 				{
+ 271:..\FreeRTOS10/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 272:..\FreeRTOS10/event_groups.c **** 				}
+ 273:..\FreeRTOS10/event_groups.c **** 			}
+ 274:..\FreeRTOS10/event_groups.c **** 			taskEXIT_CRITICAL();
+ 275:..\FreeRTOS10/event_groups.c **** 
+ 276:..\FreeRTOS10/event_groups.c **** 			xTimeoutOccurred = pdTRUE;
+ 277:..\FreeRTOS10/event_groups.c **** 		}
+ 278:..\FreeRTOS10/event_groups.c **** 		else
+ 279:..\FreeRTOS10/event_groups.c **** 		{
+ 280:..\FreeRTOS10/event_groups.c **** 			/* The task unblocked because the bits were set. */
+ 281:..\FreeRTOS10/event_groups.c **** 		}
+ 282:..\FreeRTOS10/event_groups.c **** 
+ 283:..\FreeRTOS10/event_groups.c **** 		/* Control bits might be set as the task had blocked should not be
+ 284:..\FreeRTOS10/event_groups.c **** 		returned. */
+ 285:..\FreeRTOS10/event_groups.c **** 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 286:..\FreeRTOS10/event_groups.c **** 	}
+ 287:..\FreeRTOS10/event_groups.c **** 
+ 288:..\FreeRTOS10/event_groups.c **** 	traceEVENT_GROUP_SYNC_END( xEventGroup, uxBitsToSet, uxBitsToWaitFor, xTimeoutOccurred );
+ 289:..\FreeRTOS10/event_groups.c **** 
+ 290:..\FreeRTOS10/event_groups.c **** 	/* Prevent compiler warnings when trace macros are not used. */
+ 291:..\FreeRTOS10/event_groups.c **** 	( void ) xTimeoutOccurred;
+ 292:..\FreeRTOS10/event_groups.c **** 
+ 293:..\FreeRTOS10/event_groups.c **** 	return uxReturn;
+ 294:..\FreeRTOS10/event_groups.c **** }
+ 295:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 296:..\FreeRTOS10/event_groups.c **** 
+ 297:..\FreeRTOS10/event_groups.c **** EventBits_t xEventGroupWaitBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToWaitFor,
+ 298:..\FreeRTOS10/event_groups.c **** {
+ 299:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 300:..\FreeRTOS10/event_groups.c **** EventBits_t uxReturn, uxControlBits = 0;
+ 301:..\FreeRTOS10/event_groups.c **** BaseType_t xWaitConditionMet, xAlreadyYielded;
+ 302:..\FreeRTOS10/event_groups.c **** BaseType_t xTimeoutOccurred = pdFALSE;
+ 303:..\FreeRTOS10/event_groups.c **** 
+ 304:..\FreeRTOS10/event_groups.c **** 	/* Check the user is not attempting to wait on the bits used by the kernel
+ 305:..\FreeRTOS10/event_groups.c **** 	itself, and that at least one bit is being requested. */
+ 306:..\FreeRTOS10/event_groups.c **** 	configASSERT( xEventGroup );
+ 307:..\FreeRTOS10/event_groups.c **** 	configASSERT( ( uxBitsToWaitFor & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 308:..\FreeRTOS10/event_groups.c **** 	configASSERT( uxBitsToWaitFor != 0 );
+ 309:..\FreeRTOS10/event_groups.c **** 	#if ( ( INCLUDE_xTaskGetSchedulerState == 1 ) || ( configUSE_TIMERS == 1 ) )
+ 310:..\FreeRTOS10/event_groups.c **** 	{
+ 311:..\FreeRTOS10/event_groups.c **** 		configASSERT( !( ( xTaskGetSchedulerState() == taskSCHEDULER_SUSPENDED ) && ( xTicksToWait != 0 )
+ 312:..\FreeRTOS10/event_groups.c **** 	}
+ 313:..\FreeRTOS10/event_groups.c **** 	#endif
+ 314:..\FreeRTOS10/event_groups.c **** 
+ 315:..\FreeRTOS10/event_groups.c **** 	vTaskSuspendAll();
+ 316:..\FreeRTOS10/event_groups.c **** 	{
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 7
+
+
+ 317:..\FreeRTOS10/event_groups.c **** 		const EventBits_t uxCurrentEventBits = pxEventBits->uxEventBits;
+ 318:..\FreeRTOS10/event_groups.c **** 
+ 319:..\FreeRTOS10/event_groups.c **** 		/* Check to see if the wait condition is already met or not. */
+ 320:..\FreeRTOS10/event_groups.c **** 		xWaitConditionMet = prvTestWaitCondition( uxCurrentEventBits, uxBitsToWaitFor, xWaitForAllBits );
+ 321:..\FreeRTOS10/event_groups.c **** 
+ 322:..\FreeRTOS10/event_groups.c **** 		if( xWaitConditionMet != pdFALSE )
+ 323:..\FreeRTOS10/event_groups.c **** 		{
+ 324:..\FreeRTOS10/event_groups.c **** 			/* The wait condition has already been met so there is no need to
+ 325:..\FreeRTOS10/event_groups.c **** 			block. */
+ 326:..\FreeRTOS10/event_groups.c **** 			uxReturn = uxCurrentEventBits;
+ 327:..\FreeRTOS10/event_groups.c **** 			xTicksToWait = ( TickType_t ) 0;
+ 328:..\FreeRTOS10/event_groups.c **** 
+ 329:..\FreeRTOS10/event_groups.c **** 			/* Clear the wait bits if requested to do so. */
+ 330:..\FreeRTOS10/event_groups.c **** 			if( xClearOnExit != pdFALSE )
+ 331:..\FreeRTOS10/event_groups.c **** 			{
+ 332:..\FreeRTOS10/event_groups.c **** 				pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 333:..\FreeRTOS10/event_groups.c **** 			}
+ 334:..\FreeRTOS10/event_groups.c **** 			else
+ 335:..\FreeRTOS10/event_groups.c **** 			{
+ 336:..\FreeRTOS10/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 337:..\FreeRTOS10/event_groups.c **** 			}
+ 338:..\FreeRTOS10/event_groups.c **** 		}
+ 339:..\FreeRTOS10/event_groups.c **** 		else if( xTicksToWait == ( TickType_t ) 0 )
+ 340:..\FreeRTOS10/event_groups.c **** 		{
+ 341:..\FreeRTOS10/event_groups.c **** 			/* The wait condition has not been met, but no block time was
+ 342:..\FreeRTOS10/event_groups.c **** 			specified, so just return the current value. */
+ 343:..\FreeRTOS10/event_groups.c **** 			uxReturn = uxCurrentEventBits;
+ 344:..\FreeRTOS10/event_groups.c **** 			xTimeoutOccurred = pdTRUE;
+ 345:..\FreeRTOS10/event_groups.c **** 		}
+ 346:..\FreeRTOS10/event_groups.c **** 		else
+ 347:..\FreeRTOS10/event_groups.c **** 		{
+ 348:..\FreeRTOS10/event_groups.c **** 			/* The task is going to block to wait for its required bits to be
+ 349:..\FreeRTOS10/event_groups.c **** 			set.  uxControlBits are used to remember the specified behaviour of
+ 350:..\FreeRTOS10/event_groups.c **** 			this call to xEventGroupWaitBits() - for use when the event bits
+ 351:..\FreeRTOS10/event_groups.c **** 			unblock the task. */
+ 352:..\FreeRTOS10/event_groups.c **** 			if( xClearOnExit != pdFALSE )
+ 353:..\FreeRTOS10/event_groups.c **** 			{
+ 354:..\FreeRTOS10/event_groups.c **** 				uxControlBits |= eventCLEAR_EVENTS_ON_EXIT_BIT;
+ 355:..\FreeRTOS10/event_groups.c **** 			}
+ 356:..\FreeRTOS10/event_groups.c **** 			else
+ 357:..\FreeRTOS10/event_groups.c **** 			{
+ 358:..\FreeRTOS10/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 359:..\FreeRTOS10/event_groups.c **** 			}
+ 360:..\FreeRTOS10/event_groups.c **** 
+ 361:..\FreeRTOS10/event_groups.c **** 			if( xWaitForAllBits != pdFALSE )
+ 362:..\FreeRTOS10/event_groups.c **** 			{
+ 363:..\FreeRTOS10/event_groups.c **** 				uxControlBits |= eventWAIT_FOR_ALL_BITS;
+ 364:..\FreeRTOS10/event_groups.c **** 			}
+ 365:..\FreeRTOS10/event_groups.c **** 			else
+ 366:..\FreeRTOS10/event_groups.c **** 			{
+ 367:..\FreeRTOS10/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 368:..\FreeRTOS10/event_groups.c **** 			}
+ 369:..\FreeRTOS10/event_groups.c **** 
+ 370:..\FreeRTOS10/event_groups.c **** 			/* Store the bits that the calling task is waiting for in the
+ 371:..\FreeRTOS10/event_groups.c **** 			task's event list item so the kernel knows when a match is
+ 372:..\FreeRTOS10/event_groups.c **** 			found.  Then enter the blocked state. */
+ 373:..\FreeRTOS10/event_groups.c **** 			vTaskPlaceOnUnorderedEventList( &( pxEventBits->xTasksWaitingForBits ), ( uxBitsToWaitFor | uxCo
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 8
+
+
+ 374:..\FreeRTOS10/event_groups.c **** 
+ 375:..\FreeRTOS10/event_groups.c **** 			/* This is obsolete as it will get set after the task unblocks, but
+ 376:..\FreeRTOS10/event_groups.c **** 			some compilers mistakenly generate a warning about the variable
+ 377:..\FreeRTOS10/event_groups.c **** 			being returned without being set if it is not done. */
+ 378:..\FreeRTOS10/event_groups.c **** 			uxReturn = 0;
+ 379:..\FreeRTOS10/event_groups.c **** 
+ 380:..\FreeRTOS10/event_groups.c **** 			traceEVENT_GROUP_WAIT_BITS_BLOCK( xEventGroup, uxBitsToWaitFor );
+ 381:..\FreeRTOS10/event_groups.c **** 		}
+ 382:..\FreeRTOS10/event_groups.c **** 	}
+ 383:..\FreeRTOS10/event_groups.c **** 	xAlreadyYielded = xTaskResumeAll();
+ 384:..\FreeRTOS10/event_groups.c **** 
+ 385:..\FreeRTOS10/event_groups.c **** 	if( xTicksToWait != ( TickType_t ) 0 )
+ 386:..\FreeRTOS10/event_groups.c **** 	{
+ 387:..\FreeRTOS10/event_groups.c **** 		if( xAlreadyYielded == pdFALSE )
+ 388:..\FreeRTOS10/event_groups.c **** 		{
+ 389:..\FreeRTOS10/event_groups.c **** 			portYIELD_WITHIN_API();
+ 390:..\FreeRTOS10/event_groups.c **** 		}
+ 391:..\FreeRTOS10/event_groups.c **** 		else
+ 392:..\FreeRTOS10/event_groups.c **** 		{
+ 393:..\FreeRTOS10/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 394:..\FreeRTOS10/event_groups.c **** 		}
+ 395:..\FreeRTOS10/event_groups.c **** 
+ 396:..\FreeRTOS10/event_groups.c **** 		/* The task blocked to wait for its required bits to be set - at this
+ 397:..\FreeRTOS10/event_groups.c **** 		point either the required bits were set or the block time expired.  If
+ 398:..\FreeRTOS10/event_groups.c **** 		the required bits were set they will have been stored in the task's
+ 399:..\FreeRTOS10/event_groups.c **** 		event list item, and they should now be retrieved then cleared. */
+ 400:..\FreeRTOS10/event_groups.c **** 		uxReturn = uxTaskResetEventItemValue();
+ 401:..\FreeRTOS10/event_groups.c **** 
+ 402:..\FreeRTOS10/event_groups.c **** 		if( ( uxReturn & eventUNBLOCKED_DUE_TO_BIT_SET ) == ( EventBits_t ) 0 )
+ 403:..\FreeRTOS10/event_groups.c **** 		{
+ 404:..\FreeRTOS10/event_groups.c **** 			taskENTER_CRITICAL();
+ 405:..\FreeRTOS10/event_groups.c **** 			{
+ 406:..\FreeRTOS10/event_groups.c **** 				/* The task timed out, just return the current event bit value. */
+ 407:..\FreeRTOS10/event_groups.c **** 				uxReturn = pxEventBits->uxEventBits;
+ 408:..\FreeRTOS10/event_groups.c **** 
+ 409:..\FreeRTOS10/event_groups.c **** 				/* It is possible that the event bits were updated between this
+ 410:..\FreeRTOS10/event_groups.c **** 				task leaving the Blocked state and running again. */
+ 411:..\FreeRTOS10/event_groups.c **** 				if( prvTestWaitCondition( uxReturn, uxBitsToWaitFor, xWaitForAllBits ) != pdFALSE )
+ 412:..\FreeRTOS10/event_groups.c **** 				{
+ 413:..\FreeRTOS10/event_groups.c **** 					if( xClearOnExit != pdFALSE )
+ 414:..\FreeRTOS10/event_groups.c **** 					{
+ 415:..\FreeRTOS10/event_groups.c **** 						pxEventBits->uxEventBits &= ~uxBitsToWaitFor;
+ 416:..\FreeRTOS10/event_groups.c **** 					}
+ 417:..\FreeRTOS10/event_groups.c **** 					else
+ 418:..\FreeRTOS10/event_groups.c **** 					{
+ 419:..\FreeRTOS10/event_groups.c **** 						mtCOVERAGE_TEST_MARKER();
+ 420:..\FreeRTOS10/event_groups.c **** 					}
+ 421:..\FreeRTOS10/event_groups.c **** 				}
+ 422:..\FreeRTOS10/event_groups.c **** 				else
+ 423:..\FreeRTOS10/event_groups.c **** 				{
+ 424:..\FreeRTOS10/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 425:..\FreeRTOS10/event_groups.c **** 				}
+ 426:..\FreeRTOS10/event_groups.c **** 				xTimeoutOccurred = pdTRUE;
+ 427:..\FreeRTOS10/event_groups.c **** 			}
+ 428:..\FreeRTOS10/event_groups.c **** 			taskEXIT_CRITICAL();
+ 429:..\FreeRTOS10/event_groups.c **** 		}
+ 430:..\FreeRTOS10/event_groups.c **** 		else
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 9
+
+
+ 431:..\FreeRTOS10/event_groups.c **** 		{
+ 432:..\FreeRTOS10/event_groups.c **** 			/* The task unblocked because the bits were set. */
+ 433:..\FreeRTOS10/event_groups.c **** 		}
+ 434:..\FreeRTOS10/event_groups.c **** 
+ 435:..\FreeRTOS10/event_groups.c **** 		/* The task blocked so control bits may have been set. */
+ 436:..\FreeRTOS10/event_groups.c **** 		uxReturn &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 437:..\FreeRTOS10/event_groups.c **** 	}
+ 438:..\FreeRTOS10/event_groups.c **** 	traceEVENT_GROUP_WAIT_BITS_END( xEventGroup, uxBitsToWaitFor, xTimeoutOccurred );
+ 439:..\FreeRTOS10/event_groups.c **** 
+ 440:..\FreeRTOS10/event_groups.c **** 	/* Prevent compiler warnings when trace macros are not used. */
+ 441:..\FreeRTOS10/event_groups.c **** 	( void ) xTimeoutOccurred;
+ 442:..\FreeRTOS10/event_groups.c **** 
+ 443:..\FreeRTOS10/event_groups.c **** 	return uxReturn;
+ 444:..\FreeRTOS10/event_groups.c **** }
+ 445:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 446:..\FreeRTOS10/event_groups.c **** 
+ 447:..\FreeRTOS10/event_groups.c **** EventBits_t xEventGroupClearBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToClear )
+ 448:..\FreeRTOS10/event_groups.c **** {
+ 449:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 450:..\FreeRTOS10/event_groups.c **** EventBits_t uxReturn;
+ 451:..\FreeRTOS10/event_groups.c **** 
+ 452:..\FreeRTOS10/event_groups.c **** 	/* Check the user is not attempting to clear the bits used by the kernel
+ 453:..\FreeRTOS10/event_groups.c **** 	itself. */
+ 454:..\FreeRTOS10/event_groups.c **** 	configASSERT( xEventGroup );
+ 455:..\FreeRTOS10/event_groups.c **** 	configASSERT( ( uxBitsToClear & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 456:..\FreeRTOS10/event_groups.c **** 
+ 457:..\FreeRTOS10/event_groups.c **** 	taskENTER_CRITICAL();
+ 458:..\FreeRTOS10/event_groups.c **** 	{
+ 459:..\FreeRTOS10/event_groups.c **** 		traceEVENT_GROUP_CLEAR_BITS( xEventGroup, uxBitsToClear );
+ 460:..\FreeRTOS10/event_groups.c **** 
+ 461:..\FreeRTOS10/event_groups.c **** 		/* The value returned is the event group value prior to the bits being
+ 462:..\FreeRTOS10/event_groups.c **** 		cleared. */
+ 463:..\FreeRTOS10/event_groups.c **** 		uxReturn = pxEventBits->uxEventBits;
+ 464:..\FreeRTOS10/event_groups.c **** 
+ 465:..\FreeRTOS10/event_groups.c **** 		/* Clear the bits. */
+ 466:..\FreeRTOS10/event_groups.c **** 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+ 467:..\FreeRTOS10/event_groups.c **** 	}
+ 468:..\FreeRTOS10/event_groups.c **** 	taskEXIT_CRITICAL();
+ 469:..\FreeRTOS10/event_groups.c **** 
+ 470:..\FreeRTOS10/event_groups.c **** 	return uxReturn;
+ 471:..\FreeRTOS10/event_groups.c **** }
+ 472:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 473:..\FreeRTOS10/event_groups.c **** 
+ 474:..\FreeRTOS10/event_groups.c **** #if ( ( configUSE_TRACE_FACILITY == 1 ) && ( INCLUDE_xTimerPendFunctionCall == 1 ) && ( configUSE_T
+ 475:..\FreeRTOS10/event_groups.c **** 
+ 476:..\FreeRTOS10/event_groups.c **** 	BaseType_t xEventGroupClearBitsFromISR( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsTo
+ 477:..\FreeRTOS10/event_groups.c **** 	{
+ 478:..\FreeRTOS10/event_groups.c **** 		BaseType_t xReturn;
+ 479:..\FreeRTOS10/event_groups.c **** 
+ 480:..\FreeRTOS10/event_groups.c **** 		traceEVENT_GROUP_CLEAR_BITS_FROM_ISR( xEventGroup, uxBitsToClear );
+ 481:..\FreeRTOS10/event_groups.c **** 		xReturn = xTimerPendFunctionCallFromISR( vEventGroupClearBitsCallback, ( void * ) xEventGroup, ( 
+ 482:..\FreeRTOS10/event_groups.c **** 
+ 483:..\FreeRTOS10/event_groups.c **** 		return xReturn;
+ 484:..\FreeRTOS10/event_groups.c **** 	}
+ 485:..\FreeRTOS10/event_groups.c **** 
+ 486:..\FreeRTOS10/event_groups.c **** #endif
+ 487:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 10
+
+
+ 488:..\FreeRTOS10/event_groups.c **** 
+ 489:..\FreeRTOS10/event_groups.c **** EventBits_t xEventGroupGetBitsFromISR( EventGroupHandle_t xEventGroup )
+ 490:..\FreeRTOS10/event_groups.c **** {
+ 491:..\FreeRTOS10/event_groups.c **** UBaseType_t uxSavedInterruptStatus;
+ 492:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 493:..\FreeRTOS10/event_groups.c **** EventBits_t uxReturn;
+ 494:..\FreeRTOS10/event_groups.c **** 
+ 495:..\FreeRTOS10/event_groups.c **** 	uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+ 496:..\FreeRTOS10/event_groups.c **** 	{
+ 497:..\FreeRTOS10/event_groups.c **** 		uxReturn = pxEventBits->uxEventBits;
+ 498:..\FreeRTOS10/event_groups.c **** 	}
+ 499:..\FreeRTOS10/event_groups.c **** 	portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedInterruptStatus );
+ 500:..\FreeRTOS10/event_groups.c **** 
+ 501:..\FreeRTOS10/event_groups.c **** 	return uxReturn;
+ 502:..\FreeRTOS10/event_groups.c **** }
+ 503:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 504:..\FreeRTOS10/event_groups.c **** 
+ 505:..\FreeRTOS10/event_groups.c **** EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup, const EventBits_t uxBitsToSet )
+ 506:..\FreeRTOS10/event_groups.c **** {
+ 507:..\FreeRTOS10/event_groups.c **** ListItem_t *pxListItem, *pxNext;
+ 508:..\FreeRTOS10/event_groups.c **** ListItem_t const *pxListEnd;
+ 509:..\FreeRTOS10/event_groups.c **** List_t *pxList;
+ 510:..\FreeRTOS10/event_groups.c **** EventBits_t uxBitsToClear = 0, uxBitsWaitedFor, uxControlBits;
+ 511:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 512:..\FreeRTOS10/event_groups.c **** BaseType_t xMatchFound = pdFALSE;
+ 513:..\FreeRTOS10/event_groups.c **** 
+ 514:..\FreeRTOS10/event_groups.c **** 	/* Check the user is not attempting to set the bits used by the kernel
+ 515:..\FreeRTOS10/event_groups.c **** 	itself. */
+ 516:..\FreeRTOS10/event_groups.c **** 	configASSERT( xEventGroup );
+ 517:..\FreeRTOS10/event_groups.c **** 	configASSERT( ( uxBitsToSet & eventEVENT_BITS_CONTROL_BYTES ) == 0 );
+ 518:..\FreeRTOS10/event_groups.c **** 
+ 519:..\FreeRTOS10/event_groups.c **** 	pxList = &( pxEventBits->xTasksWaitingForBits );
+ 520:..\FreeRTOS10/event_groups.c **** 	pxListEnd = listGET_END_MARKER( pxList ); /*lint !e826 !e740 The mini list structure is used as th
+ 521:..\FreeRTOS10/event_groups.c **** 	vTaskSuspendAll();
+ 522:..\FreeRTOS10/event_groups.c **** 	{
+ 523:..\FreeRTOS10/event_groups.c **** 		traceEVENT_GROUP_SET_BITS( xEventGroup, uxBitsToSet );
+ 524:..\FreeRTOS10/event_groups.c **** 
+ 525:..\FreeRTOS10/event_groups.c **** 		pxListItem = listGET_HEAD_ENTRY( pxList );
+ 526:..\FreeRTOS10/event_groups.c **** 
+ 527:..\FreeRTOS10/event_groups.c **** 		/* Set the bits. */
+ 528:..\FreeRTOS10/event_groups.c **** 		pxEventBits->uxEventBits |= uxBitsToSet;
+ 529:..\FreeRTOS10/event_groups.c **** 
+ 530:..\FreeRTOS10/event_groups.c **** 		/* See if the new bit value should unblock any tasks. */
+ 531:..\FreeRTOS10/event_groups.c **** 		while( pxListItem != pxListEnd )
+ 532:..\FreeRTOS10/event_groups.c **** 		{
+ 533:..\FreeRTOS10/event_groups.c **** 			pxNext = listGET_NEXT( pxListItem );
+ 534:..\FreeRTOS10/event_groups.c **** 			uxBitsWaitedFor = listGET_LIST_ITEM_VALUE( pxListItem );
+ 535:..\FreeRTOS10/event_groups.c **** 			xMatchFound = pdFALSE;
+ 536:..\FreeRTOS10/event_groups.c **** 
+ 537:..\FreeRTOS10/event_groups.c **** 			/* Split the bits waited for from the control bits. */
+ 538:..\FreeRTOS10/event_groups.c **** 			uxControlBits = uxBitsWaitedFor & eventEVENT_BITS_CONTROL_BYTES;
+ 539:..\FreeRTOS10/event_groups.c **** 			uxBitsWaitedFor &= ~eventEVENT_BITS_CONTROL_BYTES;
+ 540:..\FreeRTOS10/event_groups.c **** 
+ 541:..\FreeRTOS10/event_groups.c **** 			if( ( uxControlBits & eventWAIT_FOR_ALL_BITS ) == ( EventBits_t ) 0 )
+ 542:..\FreeRTOS10/event_groups.c **** 			{
+ 543:..\FreeRTOS10/event_groups.c **** 				/* Just looking for single bit being set. */
+ 544:..\FreeRTOS10/event_groups.c **** 				if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) != ( EventBits_t ) 0 )
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 11
+
+
+ 545:..\FreeRTOS10/event_groups.c **** 				{
+ 546:..\FreeRTOS10/event_groups.c **** 					xMatchFound = pdTRUE;
+ 547:..\FreeRTOS10/event_groups.c **** 				}
+ 548:..\FreeRTOS10/event_groups.c **** 				else
+ 549:..\FreeRTOS10/event_groups.c **** 				{
+ 550:..\FreeRTOS10/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 551:..\FreeRTOS10/event_groups.c **** 				}
+ 552:..\FreeRTOS10/event_groups.c **** 			}
+ 553:..\FreeRTOS10/event_groups.c **** 			else if( ( uxBitsWaitedFor & pxEventBits->uxEventBits ) == uxBitsWaitedFor )
+ 554:..\FreeRTOS10/event_groups.c **** 			{
+ 555:..\FreeRTOS10/event_groups.c **** 				/* All bits are set. */
+ 556:..\FreeRTOS10/event_groups.c **** 				xMatchFound = pdTRUE;
+ 557:..\FreeRTOS10/event_groups.c **** 			}
+ 558:..\FreeRTOS10/event_groups.c **** 			else
+ 559:..\FreeRTOS10/event_groups.c **** 			{
+ 560:..\FreeRTOS10/event_groups.c **** 				/* Need all bits to be set, but not all the bits were set. */
+ 561:..\FreeRTOS10/event_groups.c **** 			}
+ 562:..\FreeRTOS10/event_groups.c **** 
+ 563:..\FreeRTOS10/event_groups.c **** 			if( xMatchFound != pdFALSE )
+ 564:..\FreeRTOS10/event_groups.c **** 			{
+ 565:..\FreeRTOS10/event_groups.c **** 				/* The bits match.  Should the bits be cleared on exit? */
+ 566:..\FreeRTOS10/event_groups.c **** 				if( ( uxControlBits & eventCLEAR_EVENTS_ON_EXIT_BIT ) != ( EventBits_t ) 0 )
+ 567:..\FreeRTOS10/event_groups.c **** 				{
+ 568:..\FreeRTOS10/event_groups.c **** 					uxBitsToClear |= uxBitsWaitedFor;
+ 569:..\FreeRTOS10/event_groups.c **** 				}
+ 570:..\FreeRTOS10/event_groups.c **** 				else
+ 571:..\FreeRTOS10/event_groups.c **** 				{
+ 572:..\FreeRTOS10/event_groups.c **** 					mtCOVERAGE_TEST_MARKER();
+ 573:..\FreeRTOS10/event_groups.c **** 				}
+ 574:..\FreeRTOS10/event_groups.c **** 
+ 575:..\FreeRTOS10/event_groups.c **** 				/* Store the actual event flag value in the task's event list
+ 576:..\FreeRTOS10/event_groups.c **** 				item before removing the task from the event list.  The
+ 577:..\FreeRTOS10/event_groups.c **** 				eventUNBLOCKED_DUE_TO_BIT_SET bit is set so the task knows
+ 578:..\FreeRTOS10/event_groups.c **** 				that is was unblocked due to its required bits matching, rather
+ 579:..\FreeRTOS10/event_groups.c **** 				than because it timed out. */
+ 580:..\FreeRTOS10/event_groups.c **** 				vTaskRemoveFromUnorderedEventList( pxListItem, pxEventBits->uxEventBits | eventUNBLOCKED_DUE_TO
+ 581:..\FreeRTOS10/event_groups.c **** 			}
+ 582:..\FreeRTOS10/event_groups.c **** 
+ 583:..\FreeRTOS10/event_groups.c **** 			/* Move onto the next list item.  Note pxListItem->pxNext is not
+ 584:..\FreeRTOS10/event_groups.c **** 			used here as the list item may have been removed from the event list
+ 585:..\FreeRTOS10/event_groups.c **** 			and inserted into the ready/pending reading list. */
+ 586:..\FreeRTOS10/event_groups.c **** 			pxListItem = pxNext;
+ 587:..\FreeRTOS10/event_groups.c **** 		}
+ 588:..\FreeRTOS10/event_groups.c **** 
+ 589:..\FreeRTOS10/event_groups.c **** 		/* Clear any bits that matched when the eventCLEAR_EVENTS_ON_EXIT_BIT
+ 590:..\FreeRTOS10/event_groups.c **** 		bit was set in the control word. */
+ 591:..\FreeRTOS10/event_groups.c **** 		pxEventBits->uxEventBits &= ~uxBitsToClear;
+ 592:..\FreeRTOS10/event_groups.c **** 	}
+ 593:..\FreeRTOS10/event_groups.c **** 	( void ) xTaskResumeAll();
+ 594:..\FreeRTOS10/event_groups.c **** 
+ 595:..\FreeRTOS10/event_groups.c **** 	return pxEventBits->uxEventBits;
+ 596:..\FreeRTOS10/event_groups.c **** }
+ 597:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 598:..\FreeRTOS10/event_groups.c **** 
+ 599:..\FreeRTOS10/event_groups.c **** void vEventGroupDelete( EventGroupHandle_t xEventGroup )
+ 600:..\FreeRTOS10/event_groups.c **** {
+ 601:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 12
+
+
+ 602:..\FreeRTOS10/event_groups.c **** const List_t *pxTasksWaitingForBits = &( pxEventBits->xTasksWaitingForBits );
+ 603:..\FreeRTOS10/event_groups.c **** 
+ 604:..\FreeRTOS10/event_groups.c **** 	vTaskSuspendAll();
+ 605:..\FreeRTOS10/event_groups.c **** 	{
+ 606:..\FreeRTOS10/event_groups.c **** 		traceEVENT_GROUP_DELETE( xEventGroup );
+ 607:..\FreeRTOS10/event_groups.c **** 
+ 608:..\FreeRTOS10/event_groups.c **** 		while( listCURRENT_LIST_LENGTH( pxTasksWaitingForBits ) > ( UBaseType_t ) 0 )
+ 609:..\FreeRTOS10/event_groups.c **** 		{
+ 610:..\FreeRTOS10/event_groups.c **** 			/* Unblock the task, returning 0 as the event list is being deleted
+ 611:..\FreeRTOS10/event_groups.c **** 			and cannot therefore have any bits set. */
+ 612:..\FreeRTOS10/event_groups.c **** 			configASSERT( pxTasksWaitingForBits->xListEnd.pxNext != ( const ListItem_t * ) &( pxTasksWaiting
+ 613:..\FreeRTOS10/event_groups.c **** 			vTaskRemoveFromUnorderedEventList( pxTasksWaitingForBits->xListEnd.pxNext, eventUNBLOCKED_DUE_TO
+ 614:..\FreeRTOS10/event_groups.c **** 		}
+ 615:..\FreeRTOS10/event_groups.c **** 
+ 616:..\FreeRTOS10/event_groups.c **** 		#if( ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 0 ) )
+ 617:..\FreeRTOS10/event_groups.c **** 		{
+ 618:..\FreeRTOS10/event_groups.c **** 			/* The event group can only have been allocated dynamically - free
+ 619:..\FreeRTOS10/event_groups.c **** 			it again. */
+ 620:..\FreeRTOS10/event_groups.c **** 			vPortFree( pxEventBits );
+ 621:..\FreeRTOS10/event_groups.c **** 		}
+ 622:..\FreeRTOS10/event_groups.c **** 		#elif( ( configSUPPORT_DYNAMIC_ALLOCATION == 1 ) && ( configSUPPORT_STATIC_ALLOCATION == 1 ) )
+ 623:..\FreeRTOS10/event_groups.c **** 		{
+ 624:..\FreeRTOS10/event_groups.c **** 			/* The event group could have been allocated statically or
+ 625:..\FreeRTOS10/event_groups.c **** 			dynamically, so check before attempting to free the memory. */
+ 626:..\FreeRTOS10/event_groups.c **** 			if( pxEventBits->ucStaticallyAllocated == ( uint8_t ) pdFALSE )
+ 627:..\FreeRTOS10/event_groups.c **** 			{
+ 628:..\FreeRTOS10/event_groups.c **** 				vPortFree( pxEventBits );
+ 629:..\FreeRTOS10/event_groups.c **** 			}
+ 630:..\FreeRTOS10/event_groups.c **** 			else
+ 631:..\FreeRTOS10/event_groups.c **** 			{
+ 632:..\FreeRTOS10/event_groups.c **** 				mtCOVERAGE_TEST_MARKER();
+ 633:..\FreeRTOS10/event_groups.c **** 			}
+ 634:..\FreeRTOS10/event_groups.c **** 		}
+ 635:..\FreeRTOS10/event_groups.c **** 		#endif /* configSUPPORT_DYNAMIC_ALLOCATION */
+ 636:..\FreeRTOS10/event_groups.c **** 	}
+ 637:..\FreeRTOS10/event_groups.c **** 	( void ) xTaskResumeAll();
+ 638:..\FreeRTOS10/event_groups.c **** }
+ 639:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 640:..\FreeRTOS10/event_groups.c **** 
+ 641:..\FreeRTOS10/event_groups.c **** /* For internal use only - execute a 'set bits' command that was pended from
+ 642:..\FreeRTOS10/event_groups.c **** an interrupt. */
+ 643:..\FreeRTOS10/event_groups.c **** void vEventGroupSetBitsCallback( void *pvEventGroup, const uint32_t ulBitsToSet )
+ 644:..\FreeRTOS10/event_groups.c **** {
+ 645:..\FreeRTOS10/event_groups.c **** 	( void ) xEventGroupSetBits( pvEventGroup, ( EventBits_t ) ulBitsToSet );
+ 646:..\FreeRTOS10/event_groups.c **** }
+ 647:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 648:..\FreeRTOS10/event_groups.c **** 
+ 649:..\FreeRTOS10/event_groups.c **** /* For internal use only - execute a 'clear bits' command that was pended from
+ 650:..\FreeRTOS10/event_groups.c **** an interrupt. */
+ 651:..\FreeRTOS10/event_groups.c **** void vEventGroupClearBitsCallback( void *pvEventGroup, const uint32_t ulBitsToClear )
+ 652:..\FreeRTOS10/event_groups.c **** {
+ 653:..\FreeRTOS10/event_groups.c **** 	( void ) xEventGroupClearBits( pvEventGroup, ( EventBits_t ) ulBitsToClear );
+ 654:..\FreeRTOS10/event_groups.c **** }
+ 655:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 656:..\FreeRTOS10/event_groups.c **** 
+ 657:..\FreeRTOS10/event_groups.c **** static BaseType_t prvTestWaitCondition( const EventBits_t uxCurrentEventBits, const EventBits_t uxB
+ 658:..\FreeRTOS10/event_groups.c **** {
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 13
+
+
+  27              		.loc 1 658 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+  31              		@ link register save eliminated.
+  32              	.LVL0:
+ 659:..\FreeRTOS10/event_groups.c **** BaseType_t xWaitConditionMet = pdFALSE;
+ 660:..\FreeRTOS10/event_groups.c **** 
+ 661:..\FreeRTOS10/event_groups.c **** 	if( xWaitForAllBits == pdFALSE )
+  33              		.loc 1 661 0
+  34 0000 002A     		cmp	r2, #0
+  35 0002 03D1     		bne	.L2
+ 662:..\FreeRTOS10/event_groups.c **** 	{
+ 663:..\FreeRTOS10/event_groups.c **** 		/* Task only has to wait for one bit within uxBitsToWaitFor to be
+ 664:..\FreeRTOS10/event_groups.c **** 		set.  Is one already set? */
+ 665:..\FreeRTOS10/event_groups.c **** 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) != ( EventBits_t ) 0 )
+  36              		.loc 1 665 0
+  37 0004 0142     		tst	r1, r0
+  38 0006 06D1     		bne	.L4
+ 659:..\FreeRTOS10/event_groups.c **** BaseType_t xWaitConditionMet = pdFALSE;
+  39              		.loc 1 659 0
+  40 0008 0020     		movs	r0, #0
+  41              	.LVL1:
+  42 000a 07E0     		b	.L3
+  43              	.LVL2:
+  44              	.L2:
+ 666:..\FreeRTOS10/event_groups.c **** 		{
+ 667:..\FreeRTOS10/event_groups.c **** 			xWaitConditionMet = pdTRUE;
+ 668:..\FreeRTOS10/event_groups.c **** 		}
+ 669:..\FreeRTOS10/event_groups.c **** 		else
+ 670:..\FreeRTOS10/event_groups.c **** 		{
+ 671:..\FreeRTOS10/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 672:..\FreeRTOS10/event_groups.c **** 		}
+ 673:..\FreeRTOS10/event_groups.c **** 	}
+ 674:..\FreeRTOS10/event_groups.c **** 	else
+ 675:..\FreeRTOS10/event_groups.c **** 	{
+ 676:..\FreeRTOS10/event_groups.c **** 		/* Task has to wait for all the bits in uxBitsToWaitFor to be set.
+ 677:..\FreeRTOS10/event_groups.c **** 		Are they set already? */
+ 678:..\FreeRTOS10/event_groups.c **** 		if( ( uxCurrentEventBits & uxBitsToWaitFor ) == uxBitsToWaitFor )
+  45              		.loc 1 678 0
+  46 000c 0840     		ands	r0, r1
+  47              	.LVL3:
+  48 000e 8142     		cmp	r1, r0
+  49 0010 03D0     		beq	.L5
+ 659:..\FreeRTOS10/event_groups.c **** 
+  50              		.loc 1 659 0
+  51 0012 0020     		movs	r0, #0
+  52 0014 02E0     		b	.L3
+  53              	.LVL4:
+  54              	.L4:
+ 667:..\FreeRTOS10/event_groups.c **** 		}
+  55              		.loc 1 667 0
+  56 0016 0120     		movs	r0, #1
+  57              	.LVL5:
+  58 0018 00E0     		b	.L3
+  59              	.L5:
+ 679:..\FreeRTOS10/event_groups.c **** 		{
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 14
+
+
+ 680:..\FreeRTOS10/event_groups.c **** 			xWaitConditionMet = pdTRUE;
+  60              		.loc 1 680 0
+  61 001a 0120     		movs	r0, #1
+  62              	.L3:
+  63              	.LVL6:
+ 681:..\FreeRTOS10/event_groups.c **** 		}
+ 682:..\FreeRTOS10/event_groups.c **** 		else
+ 683:..\FreeRTOS10/event_groups.c **** 		{
+ 684:..\FreeRTOS10/event_groups.c **** 			mtCOVERAGE_TEST_MARKER();
+ 685:..\FreeRTOS10/event_groups.c **** 		}
+ 686:..\FreeRTOS10/event_groups.c **** 	}
+ 687:..\FreeRTOS10/event_groups.c **** 
+ 688:..\FreeRTOS10/event_groups.c **** 	return xWaitConditionMet;
+ 689:..\FreeRTOS10/event_groups.c **** }
+  64              		.loc 1 689 0
+  65              		@ sp needed
+  66 001c 7047     		bx	lr
+  67              		.cfi_endproc
+  68              	.LFE41:
+  69              		.size	prvTestWaitCondition, .-prvTestWaitCondition
+  70 001e C046     		.section	.text.xEventGroupCreate,"ax",%progbits
+  71              		.align	2
+  72              		.global	xEventGroupCreate
+  73              		.code	16
+  74              		.thumb_func
+  75              		.type	xEventGroupCreate, %function
+  76              	xEventGroupCreate:
+  77              	.LFB32:
+ 144:..\FreeRTOS10/event_groups.c **** 	EventGroup_t *pxEventBits;
+  78              		.loc 1 144 0
+  79              		.cfi_startproc
+  80              		@ args = 0, pretend = 0, frame = 0
+  81              		@ frame_needed = 0, uses_anonymous_args = 0
+  82 0000 10B5     		push	{r4, lr}
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 4, -8
+  85              		.cfi_offset 14, -4
+ 148:..\FreeRTOS10/event_groups.c **** 
+  86              		.loc 1 148 0
+  87 0002 1820     		movs	r0, #24
+  88 0004 FFF7FEFF 		bl	pvPortMalloc
+  89              	.LVL7:
+  90 0008 041E     		subs	r4, r0, #0
+  91              	.LVL8:
+ 150:..\FreeRTOS10/event_groups.c **** 		{
+  92              		.loc 1 150 0
+  93 000a 03D0     		beq	.L7
+ 152:..\FreeRTOS10/event_groups.c **** 			vListInitialise( &( pxEventBits->xTasksWaitingForBits ) );
+  94              		.loc 1 152 0
+  95 000c 0023     		movs	r3, #0
+  96 000e 08C0     		stmia	r0!, {r3}
+  97              	.LVL9:
+ 153:..\FreeRTOS10/event_groups.c **** 
+  98              		.loc 1 153 0
+  99 0010 FFF7FEFF 		bl	vListInitialise
+ 100              	.LVL10:
+ 101              	.L7:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 15
+
+
+ 172:..\FreeRTOS10/event_groups.c **** 
+ 102              		.loc 1 172 0
+ 103 0014 2000     		movs	r0, r4
+ 104              		@ sp needed
+ 105              	.LVL11:
+ 106 0016 10BD     		pop	{r4, pc}
+ 107              		.cfi_endproc
+ 108              	.LFE32:
+ 109              		.size	xEventGroupCreate, .-xEventGroupCreate
+ 110              		.section	.text.xEventGroupWaitBits,"ax",%progbits
+ 111              		.align	2
+ 112              		.global	xEventGroupWaitBits
+ 113              		.code	16
+ 114              		.thumb_func
+ 115              		.type	xEventGroupWaitBits, %function
+ 116              	xEventGroupWaitBits:
+ 117              	.LFB34:
+ 298:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 118              		.loc 1 298 0
+ 119              		.cfi_startproc
+ 120              		@ args = 4, pretend = 0, frame = 8
+ 121              		@ frame_needed = 0, uses_anonymous_args = 0
+ 122              	.LVL12:
+ 123 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 124              		.cfi_def_cfa_offset 20
+ 125              		.cfi_offset 4, -20
+ 126              		.cfi_offset 5, -16
+ 127              		.cfi_offset 6, -12
+ 128              		.cfi_offset 7, -8
+ 129              		.cfi_offset 14, -4
+ 130 0002 83B0     		sub	sp, sp, #12
+ 131              		.cfi_def_cfa_offset 32
+ 132 0004 0700     		movs	r7, r0
+ 133 0006 0D00     		movs	r5, r1
+ 134 0008 1600     		movs	r6, r2
+ 135 000a 0193     		str	r3, [sp, #4]
+ 136              	.LVL13:
+ 315:..\FreeRTOS10/event_groups.c **** 	{
+ 137              		.loc 1 315 0
+ 138 000c FFF7FEFF 		bl	vTaskSuspendAll
+ 139              	.LVL14:
+ 140              	.LBB2:
+ 317:..\FreeRTOS10/event_groups.c **** 
+ 141              		.loc 1 317 0
+ 142 0010 3C68     		ldr	r4, [r7]
+ 143              	.LVL15:
+ 320:..\FreeRTOS10/event_groups.c **** 
+ 144              		.loc 1 320 0
+ 145 0012 019A     		ldr	r2, [sp, #4]
+ 146 0014 2900     		movs	r1, r5
+ 147 0016 2000     		movs	r0, r4
+ 148 0018 FFF7FEFF 		bl	prvTestWaitCondition
+ 149              	.LVL16:
+ 322:..\FreeRTOS10/event_groups.c **** 		{
+ 150              		.loc 1 322 0
+ 151 001c 0028     		cmp	r0, #0
+ 152 001e 07D0     		beq	.L9
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 16
+
+
+ 153              	.LVL17:
+ 330:..\FreeRTOS10/event_groups.c **** 			{
+ 154              		.loc 1 330 0
+ 155 0020 002E     		cmp	r6, #0
+ 156 0022 1BD0     		beq	.L17
+ 332:..\FreeRTOS10/event_groups.c **** 			}
+ 157              		.loc 1 332 0
+ 158 0024 2300     		movs	r3, r4
+ 159 0026 AB43     		bics	r3, r5
+ 160 0028 3B60     		str	r3, [r7]
+ 327:..\FreeRTOS10/event_groups.c **** 
+ 161              		.loc 1 327 0
+ 162 002a 0023     		movs	r3, #0
+ 163 002c 0893     		str	r3, [sp, #32]
+ 164 002e 17E0     		b	.L10
+ 165              	.LVL18:
+ 166              	.L9:
+ 339:..\FreeRTOS10/event_groups.c **** 		{
+ 167              		.loc 1 339 0
+ 168 0030 089B     		ldr	r3, [sp, #32]
+ 169 0032 002B     		cmp	r3, #0
+ 170 0034 14D0     		beq	.L10
+ 352:..\FreeRTOS10/event_groups.c **** 			{
+ 171              		.loc 1 352 0
+ 172 0036 002E     		cmp	r6, #0
+ 173 0038 01D1     		bne	.L18
+ 174              	.LBE2:
+ 300:..\FreeRTOS10/event_groups.c **** BaseType_t xWaitConditionMet, xAlreadyYielded;
+ 175              		.loc 1 300 0
+ 176 003a 0021     		movs	r1, #0
+ 177 003c 01E0     		b	.L11
+ 178              	.L18:
+ 179              	.LBB3:
+ 354:..\FreeRTOS10/event_groups.c **** 			}
+ 180              		.loc 1 354 0
+ 181 003e 8021     		movs	r1, #128
+ 182 0040 4904     		lsls	r1, r1, #17
+ 183              	.L11:
+ 184              	.LVL19:
+ 361:..\FreeRTOS10/event_groups.c **** 			{
+ 185              		.loc 1 361 0
+ 186 0042 019B     		ldr	r3, [sp, #4]
+ 187 0044 002B     		cmp	r3, #0
+ 188 0046 02D0     		beq	.L12
+ 363:..\FreeRTOS10/event_groups.c **** 			}
+ 189              		.loc 1 363 0
+ 190 0048 8023     		movs	r3, #128
+ 191 004a DB04     		lsls	r3, r3, #19
+ 192 004c 1943     		orrs	r1, r3
+ 193              	.LVL20:
+ 194              	.L12:
+ 373:..\FreeRTOS10/event_groups.c **** 
+ 195              		.loc 1 373 0
+ 196 004e 2943     		orrs	r1, r5
+ 197              	.LVL21:
+ 198 0050 381D     		adds	r0, r7, #4
+ 199              	.LVL22:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 17
+
+
+ 200 0052 089A     		ldr	r2, [sp, #32]
+ 201 0054 FFF7FEFF 		bl	vTaskPlaceOnUnorderedEventList
+ 202              	.LVL23:
+ 378:..\FreeRTOS10/event_groups.c **** 
+ 203              		.loc 1 378 0
+ 204 0058 0024     		movs	r4, #0
+ 205              	.LVL24:
+ 206 005a 01E0     		b	.L10
+ 207              	.LVL25:
+ 208              	.L17:
+ 327:..\FreeRTOS10/event_groups.c **** 
+ 209              		.loc 1 327 0
+ 210 005c 0023     		movs	r3, #0
+ 211 005e 0893     		str	r3, [sp, #32]
+ 212              	.LVL26:
+ 213              	.L10:
+ 214              	.LBE3:
+ 383:..\FreeRTOS10/event_groups.c **** 
+ 215              		.loc 1 383 0
+ 216 0060 FFF7FEFF 		bl	xTaskResumeAll
+ 217              	.LVL27:
+ 385:..\FreeRTOS10/event_groups.c **** 	{
+ 218              		.loc 1 385 0
+ 219 0064 089B     		ldr	r3, [sp, #32]
+ 220 0066 002B     		cmp	r3, #0
+ 221 0068 1BD0     		beq	.L13
+ 387:..\FreeRTOS10/event_groups.c **** 		{
+ 222              		.loc 1 387 0
+ 223 006a 0028     		cmp	r0, #0
+ 224 006c 01D1     		bne	.L14
+ 389:..\FreeRTOS10/event_groups.c **** 		}
+ 225              		.loc 1 389 0
+ 226 006e FFF7FEFF 		bl	vPortYield
+ 227              	.LVL28:
+ 228              	.L14:
+ 400:..\FreeRTOS10/event_groups.c **** 
+ 229              		.loc 1 400 0
+ 230 0072 FFF7FEFF 		bl	uxTaskResetEventItemValue
+ 231              	.LVL29:
+ 232 0076 0400     		movs	r4, r0
+ 233              	.LVL30:
+ 402:..\FreeRTOS10/event_groups.c **** 		{
+ 234              		.loc 1 402 0
+ 235 0078 8301     		lsls	r3, r0, #6
+ 236 007a 10D4     		bmi	.L15
+ 404:..\FreeRTOS10/event_groups.c **** 			{
+ 237              		.loc 1 404 0
+ 238 007c FFF7FEFF 		bl	vPortEnterCritical
+ 239              	.LVL31:
+ 407:..\FreeRTOS10/event_groups.c **** 
+ 240              		.loc 1 407 0
+ 241 0080 3C68     		ldr	r4, [r7]
+ 242              	.LVL32:
+ 411:..\FreeRTOS10/event_groups.c **** 				{
+ 243              		.loc 1 411 0
+ 244 0082 019A     		ldr	r2, [sp, #4]
+ 245 0084 2900     		movs	r1, r5
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 18
+
+
+ 246 0086 2000     		movs	r0, r4
+ 247 0088 FFF7FEFF 		bl	prvTestWaitCondition
+ 248              	.LVL33:
+ 249 008c 0028     		cmp	r0, #0
+ 250 008e 04D0     		beq	.L16
+ 413:..\FreeRTOS10/event_groups.c **** 					{
+ 251              		.loc 1 413 0
+ 252 0090 002E     		cmp	r6, #0
+ 253 0092 02D0     		beq	.L16
+ 415:..\FreeRTOS10/event_groups.c **** 					}
+ 254              		.loc 1 415 0
+ 255 0094 2300     		movs	r3, r4
+ 256 0096 AB43     		bics	r3, r5
+ 257 0098 3B60     		str	r3, [r7]
+ 258              	.L16:
+ 259              	.LVL34:
+ 428:..\FreeRTOS10/event_groups.c **** 		}
+ 260              		.loc 1 428 0
+ 261 009a FFF7FEFF 		bl	vPortExitCritical
+ 262              	.LVL35:
+ 263              	.L15:
+ 436:..\FreeRTOS10/event_groups.c **** 	}
+ 264              		.loc 1 436 0
+ 265 009e 2402     		lsls	r4, r4, #8
+ 266              	.LVL36:
+ 267 00a0 240A     		lsrs	r4, r4, #8
+ 268              	.LVL37:
+ 269              	.L13:
+ 444:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 270              		.loc 1 444 0
+ 271 00a2 2000     		movs	r0, r4
+ 272 00a4 03B0     		add	sp, sp, #12
+ 273              		@ sp needed
+ 274              	.LVL38:
+ 275              	.LVL39:
+ 276              	.LVL40:
+ 277              	.LVL41:
+ 278 00a6 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 279              		.cfi_endproc
+ 280              	.LFE34:
+ 281              		.size	xEventGroupWaitBits, .-xEventGroupWaitBits
+ 282              		.section	.text.xEventGroupClearBits,"ax",%progbits
+ 283              		.align	2
+ 284              		.global	xEventGroupClearBits
+ 285              		.code	16
+ 286              		.thumb_func
+ 287              		.type	xEventGroupClearBits, %function
+ 288              	xEventGroupClearBits:
+ 289              	.LFB35:
+ 448:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 290              		.loc 1 448 0
+ 291              		.cfi_startproc
+ 292              		@ args = 0, pretend = 0, frame = 0
+ 293              		@ frame_needed = 0, uses_anonymous_args = 0
+ 294              	.LVL42:
+ 295 0000 70B5     		push	{r4, r5, r6, lr}
+ 296              		.cfi_def_cfa_offset 16
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 19
+
+
+ 297              		.cfi_offset 4, -16
+ 298              		.cfi_offset 5, -12
+ 299              		.cfi_offset 6, -8
+ 300              		.cfi_offset 14, -4
+ 301 0002 0500     		movs	r5, r0
+ 302 0004 0E00     		movs	r6, r1
+ 303              	.LVL43:
+ 457:..\FreeRTOS10/event_groups.c **** 	{
+ 304              		.loc 1 457 0
+ 305 0006 FFF7FEFF 		bl	vPortEnterCritical
+ 306              	.LVL44:
+ 463:..\FreeRTOS10/event_groups.c **** 
+ 307              		.loc 1 463 0
+ 308 000a 2C68     		ldr	r4, [r5]
+ 309              	.LVL45:
+ 466:..\FreeRTOS10/event_groups.c **** 	}
+ 310              		.loc 1 466 0
+ 311 000c 2300     		movs	r3, r4
+ 312 000e B343     		bics	r3, r6
+ 313 0010 2B60     		str	r3, [r5]
+ 468:..\FreeRTOS10/event_groups.c **** 
+ 314              		.loc 1 468 0
+ 315 0012 FFF7FEFF 		bl	vPortExitCritical
+ 316              	.LVL46:
+ 471:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 317              		.loc 1 471 0
+ 318 0016 2000     		movs	r0, r4
+ 319              		@ sp needed
+ 320              	.LVL47:
+ 321              	.LVL48:
+ 322              	.LVL49:
+ 323 0018 70BD     		pop	{r4, r5, r6, pc}
+ 324              		.cfi_endproc
+ 325              	.LFE35:
+ 326              		.size	xEventGroupClearBits, .-xEventGroupClearBits
+ 327 001a C046     		.section	.text.xEventGroupGetBitsFromISR,"ax",%progbits
+ 328              		.align	2
+ 329              		.global	xEventGroupGetBitsFromISR
+ 330              		.code	16
+ 331              		.thumb_func
+ 332              		.type	xEventGroupGetBitsFromISR, %function
+ 333              	xEventGroupGetBitsFromISR:
+ 334              	.LFB36:
+ 490:..\FreeRTOS10/event_groups.c **** UBaseType_t uxSavedInterruptStatus;
+ 335              		.loc 1 490 0
+ 336              		.cfi_startproc
+ 337              		@ args = 0, pretend = 0, frame = 0
+ 338              		@ frame_needed = 0, uses_anonymous_args = 0
+ 339              	.LVL50:
+ 340 0000 10B5     		push	{r4, lr}
+ 341              		.cfi_def_cfa_offset 8
+ 342              		.cfi_offset 4, -8
+ 343              		.cfi_offset 14, -4
+ 344 0002 0400     		movs	r4, r0
+ 345              	.LVL51:
+ 495:..\FreeRTOS10/event_groups.c **** 	{
+ 346              		.loc 1 495 0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 20
+
+
+ 347 0004 FFF7FEFF 		bl	ulSetInterruptMaskFromISR
+ 348              	.LVL52:
+ 497:..\FreeRTOS10/event_groups.c **** 	}
+ 349              		.loc 1 497 0
+ 350 0008 2468     		ldr	r4, [r4]
+ 351              	.LVL53:
+ 499:..\FreeRTOS10/event_groups.c **** 
+ 352              		.loc 1 499 0
+ 353 000a FFF7FEFF 		bl	vClearInterruptMaskFromISR
+ 354              	.LVL54:
+ 502:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 355              		.loc 1 502 0
+ 356 000e 2000     		movs	r0, r4
+ 357              		@ sp needed
+ 358              	.LVL55:
+ 359 0010 10BD     		pop	{r4, pc}
+ 360              		.cfi_endproc
+ 361              	.LFE36:
+ 362              		.size	xEventGroupGetBitsFromISR, .-xEventGroupGetBitsFromISR
+ 363 0012 C046     		.section	.text.xEventGroupSetBits,"ax",%progbits
+ 364              		.align	2
+ 365              		.global	xEventGroupSetBits
+ 366              		.code	16
+ 367              		.thumb_func
+ 368              		.type	xEventGroupSetBits, %function
+ 369              	xEventGroupSetBits:
+ 370              	.LFB37:
+ 506:..\FreeRTOS10/event_groups.c **** ListItem_t *pxListItem, *pxNext;
+ 371              		.loc 1 506 0
+ 372              		.cfi_startproc
+ 373              		@ args = 0, pretend = 0, frame = 0
+ 374              		@ frame_needed = 0, uses_anonymous_args = 0
+ 375              	.LVL56:
+ 376 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 377              		.cfi_def_cfa_offset 24
+ 378              		.cfi_offset 3, -24
+ 379              		.cfi_offset 4, -20
+ 380              		.cfi_offset 5, -16
+ 381              		.cfi_offset 6, -12
+ 382              		.cfi_offset 7, -8
+ 383              		.cfi_offset 14, -4
+ 384 0002 0400     		movs	r4, r0
+ 385 0004 0D00     		movs	r5, r1
+ 386              	.LVL57:
+ 520:..\FreeRTOS10/event_groups.c **** 	vTaskSuspendAll();
+ 387              		.loc 1 520 0
+ 388 0006 0600     		movs	r6, r0
+ 389 0008 0C36     		adds	r6, r6, #12
+ 390              	.LVL58:
+ 521:..\FreeRTOS10/event_groups.c **** 	{
+ 391              		.loc 1 521 0
+ 392 000a FFF7FEFF 		bl	vTaskSuspendAll
+ 393              	.LVL59:
+ 525:..\FreeRTOS10/event_groups.c **** 
+ 394              		.loc 1 525 0
+ 395 000e 2069     		ldr	r0, [r4, #16]
+ 396              	.LVL60:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 21
+
+
+ 528:..\FreeRTOS10/event_groups.c **** 
+ 397              		.loc 1 528 0
+ 398 0010 2368     		ldr	r3, [r4]
+ 399 0012 1D43     		orrs	r5, r3
+ 400              	.LVL61:
+ 401 0014 2560     		str	r5, [r4]
+ 510:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 402              		.loc 1 510 0
+ 403 0016 0027     		movs	r7, #0
+ 531:..\FreeRTOS10/event_groups.c **** 		{
+ 404              		.loc 1 531 0
+ 405 0018 1FE0     		b	.L22
+ 406              	.LVL62:
+ 407              	.L27:
+ 533:..\FreeRTOS10/event_groups.c **** 			uxBitsWaitedFor = listGET_LIST_ITEM_VALUE( pxListItem );
+ 408              		.loc 1 533 0
+ 409 001a 4568     		ldr	r5, [r0, #4]
+ 410              	.LVL63:
+ 534:..\FreeRTOS10/event_groups.c **** 			xMatchFound = pdFALSE;
+ 411              		.loc 1 534 0
+ 412 001c 0268     		ldr	r2, [r0]
+ 413              	.LVL64:
+ 539:..\FreeRTOS10/event_groups.c **** 
+ 414              		.loc 1 539 0
+ 415 001e 1302     		lsls	r3, r2, #8
+ 416 0020 1B0A     		lsrs	r3, r3, #8
+ 417              	.LVL65:
+ 541:..\FreeRTOS10/event_groups.c **** 			{
+ 418              		.loc 1 541 0
+ 419 0022 5101     		lsls	r1, r2, #5
+ 420 0024 04D4     		bmi	.L23
+ 544:..\FreeRTOS10/event_groups.c **** 				{
+ 421              		.loc 1 544 0
+ 422 0026 2168     		ldr	r1, [r4]
+ 423 0028 1942     		tst	r1, r3
+ 424 002a 07D1     		bne	.L28
+ 535:..\FreeRTOS10/event_groups.c **** 
+ 425              		.loc 1 535 0
+ 426 002c 0021     		movs	r1, #0
+ 427 002e 08E0     		b	.L24
+ 428              	.L23:
+ 553:..\FreeRTOS10/event_groups.c **** 			{
+ 429              		.loc 1 553 0
+ 430 0030 2168     		ldr	r1, [r4]
+ 431 0032 1940     		ands	r1, r3
+ 432 0034 8B42     		cmp	r3, r1
+ 433 0036 03D0     		beq	.L29
+ 535:..\FreeRTOS10/event_groups.c **** 
+ 434              		.loc 1 535 0
+ 435 0038 0021     		movs	r1, #0
+ 436 003a 02E0     		b	.L24
+ 437              	.L28:
+ 546:..\FreeRTOS10/event_groups.c **** 				}
+ 438              		.loc 1 546 0
+ 439 003c 0121     		movs	r1, #1
+ 440 003e 00E0     		b	.L24
+ 441              	.L29:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 22
+
+
+ 556:..\FreeRTOS10/event_groups.c **** 			}
+ 442              		.loc 1 556 0
+ 443 0040 0121     		movs	r1, #1
+ 444              	.L24:
+ 445              	.LVL66:
+ 563:..\FreeRTOS10/event_groups.c **** 			{
+ 446              		.loc 1 563 0
+ 447 0042 0029     		cmp	r1, #0
+ 448 0044 08D0     		beq	.L25
+ 566:..\FreeRTOS10/event_groups.c **** 				{
+ 449              		.loc 1 566 0
+ 450 0046 D201     		lsls	r2, r2, #7
+ 451 0048 00D5     		bpl	.L26
+ 452              	.LVL67:
+ 568:..\FreeRTOS10/event_groups.c **** 				}
+ 453              		.loc 1 568 0
+ 454 004a 1F43     		orrs	r7, r3
+ 455              	.LVL68:
+ 456              	.L26:
+ 580:..\FreeRTOS10/event_groups.c **** 			}
+ 457              		.loc 1 580 0
+ 458 004c 8021     		movs	r1, #128
+ 459              	.LVL69:
+ 460 004e 8904     		lsls	r1, r1, #18
+ 461 0050 2368     		ldr	r3, [r4]
+ 462              	.LVL70:
+ 463 0052 1943     		orrs	r1, r3
+ 464 0054 FFF7FEFF 		bl	vTaskRemoveFromUnorderedEventList
+ 465              	.LVL71:
+ 466              	.L25:
+ 535:..\FreeRTOS10/event_groups.c **** 
+ 467              		.loc 1 535 0
+ 468 0058 2800     		movs	r0, r5
+ 469              	.LVL72:
+ 470              	.L22:
+ 531:..\FreeRTOS10/event_groups.c **** 		{
+ 471              		.loc 1 531 0
+ 472 005a B042     		cmp	r0, r6
+ 473 005c DDD1     		bne	.L27
+ 591:..\FreeRTOS10/event_groups.c **** 	}
+ 474              		.loc 1 591 0
+ 475 005e 2368     		ldr	r3, [r4]
+ 476 0060 BB43     		bics	r3, r7
+ 477 0062 2360     		str	r3, [r4]
+ 593:..\FreeRTOS10/event_groups.c **** 
+ 478              		.loc 1 593 0
+ 479 0064 FFF7FEFF 		bl	xTaskResumeAll
+ 480              	.LVL73:
+ 595:..\FreeRTOS10/event_groups.c **** }
+ 481              		.loc 1 595 0
+ 482 0068 2068     		ldr	r0, [r4]
+ 596:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 483              		.loc 1 596 0
+ 484              		@ sp needed
+ 485              	.LVL74:
+ 486              	.LVL75:
+ 487              	.LVL76:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 23
+
+
+ 488 006a F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 489              		.cfi_endproc
+ 490              	.LFE37:
+ 491              		.size	xEventGroupSetBits, .-xEventGroupSetBits
+ 492              		.section	.text.xEventGroupSync,"ax",%progbits
+ 493              		.align	2
+ 494              		.global	xEventGroupSync
+ 495              		.code	16
+ 496              		.thumb_func
+ 497              		.type	xEventGroupSync, %function
+ 498              	xEventGroupSync:
+ 499              	.LFB33:
+ 178:..\FreeRTOS10/event_groups.c **** EventBits_t uxOriginalBitValue, uxReturn;
+ 500              		.loc 1 178 0
+ 501              		.cfi_startproc
+ 502              		@ args = 0, pretend = 0, frame = 8
+ 503              		@ frame_needed = 0, uses_anonymous_args = 0
+ 504              	.LVL77:
+ 505 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 506              		.cfi_def_cfa_offset 20
+ 507              		.cfi_offset 4, -20
+ 508              		.cfi_offset 5, -16
+ 509              		.cfi_offset 6, -12
+ 510              		.cfi_offset 7, -8
+ 511              		.cfi_offset 14, -4
+ 512 0002 83B0     		sub	sp, sp, #12
+ 513              		.cfi_def_cfa_offset 32
+ 514 0004 0600     		movs	r6, r0
+ 515 0006 0191     		str	r1, [sp, #4]
+ 516 0008 1700     		movs	r7, r2
+ 517 000a 1D00     		movs	r5, r3
+ 518              	.LVL78:
+ 192:..\FreeRTOS10/event_groups.c **** 	{
+ 519              		.loc 1 192 0
+ 520 000c FFF7FEFF 		bl	vTaskSuspendAll
+ 521              	.LVL79:
+ 194:..\FreeRTOS10/event_groups.c **** 
+ 522              		.loc 1 194 0
+ 523 0010 3468     		ldr	r4, [r6]
+ 524              	.LVL80:
+ 196:..\FreeRTOS10/event_groups.c **** 
+ 525              		.loc 1 196 0
+ 526 0012 0199     		ldr	r1, [sp, #4]
+ 527 0014 3000     		movs	r0, r6
+ 528 0016 FFF7FEFF 		bl	xEventGroupSetBits
+ 529              	.LVL81:
+ 198:..\FreeRTOS10/event_groups.c **** 		{
+ 530              		.loc 1 198 0
+ 531 001a 019B     		ldr	r3, [sp, #4]
+ 532 001c 1C43     		orrs	r4, r3
+ 533              	.LVL82:
+ 534 001e 3B00     		movs	r3, r7
+ 535 0020 2340     		ands	r3, r4
+ 536 0022 9F42     		cmp	r7, r3
+ 537 0024 04D1     		bne	.L31
+ 538              	.LVL83:
+ 205:..\FreeRTOS10/event_groups.c **** 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 24
+
+
+ 539              		.loc 1 205 0
+ 540 0026 3368     		ldr	r3, [r6]
+ 541 0028 BB43     		bics	r3, r7
+ 542 002a 3360     		str	r3, [r6]
+ 543              	.LVL84:
+ 207:..\FreeRTOS10/event_groups.c **** 		}
+ 544              		.loc 1 207 0
+ 545 002c 0025     		movs	r5, #0
+ 546 002e 0BE0     		b	.L32
+ 547              	.LVL85:
+ 548              	.L31:
+ 211:..\FreeRTOS10/event_groups.c **** 			{
+ 549              		.loc 1 211 0
+ 550 0030 002D     		cmp	r5, #0
+ 551 0032 08D0     		beq	.L33
+ 218:..\FreeRTOS10/event_groups.c **** 
+ 552              		.loc 1 218 0
+ 553 0034 A021     		movs	r1, #160
+ 554 0036 C904     		lsls	r1, r1, #19
+ 555 0038 3943     		orrs	r1, r7
+ 556 003a 301D     		adds	r0, r6, #4
+ 557 003c 2A00     		movs	r2, r5
+ 558 003e FFF7FEFF 		bl	vTaskPlaceOnUnorderedEventList
+ 559              	.LVL86:
+ 224:..\FreeRTOS10/event_groups.c **** 			}
+ 560              		.loc 1 224 0
+ 561 0042 0024     		movs	r4, #0
+ 562 0044 00E0     		b	.L32
+ 563              	.LVL87:
+ 564              	.L33:
+ 230:..\FreeRTOS10/event_groups.c **** 				xTimeoutOccurred = pdTRUE;
+ 565              		.loc 1 230 0
+ 566 0046 3468     		ldr	r4, [r6]
+ 567              	.LVL88:
+ 568              	.L32:
+ 235:..\FreeRTOS10/event_groups.c **** 
+ 569              		.loc 1 235 0
+ 570 0048 FFF7FEFF 		bl	xTaskResumeAll
+ 571              	.LVL89:
+ 237:..\FreeRTOS10/event_groups.c **** 	{
+ 572              		.loc 1 237 0
+ 573 004c 002D     		cmp	r5, #0
+ 574 004e 16D0     		beq	.L34
+ 239:..\FreeRTOS10/event_groups.c **** 		{
+ 575              		.loc 1 239 0
+ 576 0050 0028     		cmp	r0, #0
+ 577 0052 01D1     		bne	.L35
+ 241:..\FreeRTOS10/event_groups.c **** 		}
+ 578              		.loc 1 241 0
+ 579 0054 FFF7FEFF 		bl	vPortYield
+ 580              	.LVL90:
+ 581              	.L35:
+ 252:..\FreeRTOS10/event_groups.c **** 
+ 582              		.loc 1 252 0
+ 583 0058 FFF7FEFF 		bl	uxTaskResetEventItemValue
+ 584              	.LVL91:
+ 585 005c 0400     		movs	r4, r0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 25
+
+
+ 586              	.LVL92:
+ 254:..\FreeRTOS10/event_groups.c **** 		{
+ 587              		.loc 1 254 0
+ 588 005e 8301     		lsls	r3, r0, #6
+ 589 0060 0BD4     		bmi	.L36
+ 257:..\FreeRTOS10/event_groups.c **** 			{
+ 590              		.loc 1 257 0
+ 591 0062 FFF7FEFF 		bl	vPortEnterCritical
+ 592              	.LVL93:
+ 259:..\FreeRTOS10/event_groups.c **** 
+ 593              		.loc 1 259 0
+ 594 0066 3468     		ldr	r4, [r6]
+ 595              	.LVL94:
+ 265:..\FreeRTOS10/event_groups.c **** 				{
+ 596              		.loc 1 265 0
+ 597 0068 2300     		movs	r3, r4
+ 598 006a 3B40     		ands	r3, r7
+ 599 006c 9F42     		cmp	r7, r3
+ 600 006e 02D1     		bne	.L37
+ 267:..\FreeRTOS10/event_groups.c **** 				}
+ 601              		.loc 1 267 0
+ 602 0070 2300     		movs	r3, r4
+ 603 0072 BB43     		bics	r3, r7
+ 604 0074 3360     		str	r3, [r6]
+ 605              	.L37:
+ 274:..\FreeRTOS10/event_groups.c **** 
+ 606              		.loc 1 274 0
+ 607 0076 FFF7FEFF 		bl	vPortExitCritical
+ 608              	.LVL95:
+ 609              	.L36:
+ 285:..\FreeRTOS10/event_groups.c **** 	}
+ 610              		.loc 1 285 0
+ 611 007a 2402     		lsls	r4, r4, #8
+ 612              	.LVL96:
+ 613 007c 240A     		lsrs	r4, r4, #8
+ 614              	.LVL97:
+ 615              	.L34:
+ 294:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 616              		.loc 1 294 0
+ 617 007e 2000     		movs	r0, r4
+ 618 0080 03B0     		add	sp, sp, #12
+ 619              		@ sp needed
+ 620              	.LVL98:
+ 621              	.LVL99:
+ 622              	.LVL100:
+ 623              	.LVL101:
+ 624 0082 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 625              		.cfi_endproc
+ 626              	.LFE33:
+ 627              		.size	xEventGroupSync, .-xEventGroupSync
+ 628              		.section	.text.vEventGroupDelete,"ax",%progbits
+ 629              		.align	2
+ 630              		.global	vEventGroupDelete
+ 631              		.code	16
+ 632              		.thumb_func
+ 633              		.type	vEventGroupDelete, %function
+ 634              	vEventGroupDelete:
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 26
+
+
+ 635              	.LFB38:
+ 600:..\FreeRTOS10/event_groups.c **** EventGroup_t *pxEventBits = ( EventGroup_t * ) xEventGroup;
+ 636              		.loc 1 600 0
+ 637              		.cfi_startproc
+ 638              		@ args = 0, pretend = 0, frame = 0
+ 639              		@ frame_needed = 0, uses_anonymous_args = 0
+ 640              	.LVL102:
+ 641 0000 10B5     		push	{r4, lr}
+ 642              		.cfi_def_cfa_offset 8
+ 643              		.cfi_offset 4, -8
+ 644              		.cfi_offset 14, -4
+ 645 0002 0400     		movs	r4, r0
+ 646              	.LVL103:
+ 604:..\FreeRTOS10/event_groups.c **** 	{
+ 647              		.loc 1 604 0
+ 648 0004 FFF7FEFF 		bl	vTaskSuspendAll
+ 649              	.LVL104:
+ 608:..\FreeRTOS10/event_groups.c **** 		{
+ 650              		.loc 1 608 0
+ 651 0008 04E0     		b	.L39
+ 652              	.L40:
+ 613:..\FreeRTOS10/event_groups.c **** 		}
+ 653              		.loc 1 613 0
+ 654 000a 8021     		movs	r1, #128
+ 655 000c 8904     		lsls	r1, r1, #18
+ 656 000e 2069     		ldr	r0, [r4, #16]
+ 657 0010 FFF7FEFF 		bl	vTaskRemoveFromUnorderedEventList
+ 658              	.LVL105:
+ 659              	.L39:
+ 608:..\FreeRTOS10/event_groups.c **** 		{
+ 660              		.loc 1 608 0
+ 661 0014 6368     		ldr	r3, [r4, #4]
+ 662 0016 002B     		cmp	r3, #0
+ 663 0018 F7D1     		bne	.L40
+ 620:..\FreeRTOS10/event_groups.c **** 		}
+ 664              		.loc 1 620 0
+ 665 001a 2000     		movs	r0, r4
+ 666 001c FFF7FEFF 		bl	vPortFree
+ 667              	.LVL106:
+ 637:..\FreeRTOS10/event_groups.c **** }
+ 668              		.loc 1 637 0
+ 669 0020 FFF7FEFF 		bl	xTaskResumeAll
+ 670              	.LVL107:
+ 638:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 671              		.loc 1 638 0
+ 672              		@ sp needed
+ 673              	.LVL108:
+ 674 0024 10BD     		pop	{r4, pc}
+ 675              		.cfi_endproc
+ 676              	.LFE38:
+ 677              		.size	vEventGroupDelete, .-vEventGroupDelete
+ 678 0026 C046     		.section	.text.vEventGroupSetBitsCallback,"ax",%progbits
+ 679              		.align	2
+ 680              		.global	vEventGroupSetBitsCallback
+ 681              		.code	16
+ 682              		.thumb_func
+ 683              		.type	vEventGroupSetBitsCallback, %function
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 27
+
+
+ 684              	vEventGroupSetBitsCallback:
+ 685              	.LFB39:
+ 644:..\FreeRTOS10/event_groups.c **** 	( void ) xEventGroupSetBits( pvEventGroup, ( EventBits_t ) ulBitsToSet );
+ 686              		.loc 1 644 0
+ 687              		.cfi_startproc
+ 688              		@ args = 0, pretend = 0, frame = 0
+ 689              		@ frame_needed = 0, uses_anonymous_args = 0
+ 690              	.LVL109:
+ 691 0000 10B5     		push	{r4, lr}
+ 692              		.cfi_def_cfa_offset 8
+ 693              		.cfi_offset 4, -8
+ 694              		.cfi_offset 14, -4
+ 645:..\FreeRTOS10/event_groups.c **** }
+ 695              		.loc 1 645 0
+ 696 0002 FFF7FEFF 		bl	xEventGroupSetBits
+ 697              	.LVL110:
+ 646:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 698              		.loc 1 646 0
+ 699              		@ sp needed
+ 700 0006 10BD     		pop	{r4, pc}
+ 701              		.cfi_endproc
+ 702              	.LFE39:
+ 703              		.size	vEventGroupSetBitsCallback, .-vEventGroupSetBitsCallback
+ 704              		.section	.text.vEventGroupClearBitsCallback,"ax",%progbits
+ 705              		.align	2
+ 706              		.global	vEventGroupClearBitsCallback
+ 707              		.code	16
+ 708              		.thumb_func
+ 709              		.type	vEventGroupClearBitsCallback, %function
+ 710              	vEventGroupClearBitsCallback:
+ 711              	.LFB40:
+ 652:..\FreeRTOS10/event_groups.c **** 	( void ) xEventGroupClearBits( pvEventGroup, ( EventBits_t ) ulBitsToClear );
+ 712              		.loc 1 652 0
+ 713              		.cfi_startproc
+ 714              		@ args = 0, pretend = 0, frame = 0
+ 715              		@ frame_needed = 0, uses_anonymous_args = 0
+ 716              	.LVL111:
+ 717 0000 10B5     		push	{r4, lr}
+ 718              		.cfi_def_cfa_offset 8
+ 719              		.cfi_offset 4, -8
+ 720              		.cfi_offset 14, -4
+ 653:..\FreeRTOS10/event_groups.c **** }
+ 721              		.loc 1 653 0
+ 722 0002 FFF7FEFF 		bl	xEventGroupClearBits
+ 723              	.LVL112:
+ 654:..\FreeRTOS10/event_groups.c **** /*-----------------------------------------------------------*/
+ 724              		.loc 1 654 0
+ 725              		@ sp needed
+ 726 0006 10BD     		pop	{r4, pc}
+ 727              		.cfi_endproc
+ 728              	.LFE40:
+ 729              		.size	vEventGroupClearBitsCallback, .-vEventGroupClearBitsCallback
+ 730              		.text
+ 731              	.Letext0:
+ 732              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.1\\psoc creator\\import\\gnu\\arm\\5.4.
+ 733              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.1\\psoc creator\\import\\gnu\\arm\\5.4.
+ 734              		.file 4 "..\\FreeRTOS10\\portable\\GCC\\ARM_CM0/portmacro.h"
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 28
+
+
+ 735              		.file 5 "..\\FreeRTOS10\\include/list.h"
+ 736              		.file 6 "..\\FreeRTOS10\\include/event_groups.h"
+ 737              		.file 7 "..\\FreeRTOS10\\include/portable.h"
+ 738              		.file 8 "..\\FreeRTOS10\\include/task.h"
+ 739              		.section	.debug_info,"",%progbits
+ 740              	.Ldebug_info0:
+ 741 0000 BA080000 		.4byte	0x8ba
+ 742 0004 0400     		.2byte	0x4
+ 743 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 744 000a 04       		.byte	0x4
+ 745 000b 01       		.uleb128 0x1
+ 746 000c 00010000 		.4byte	.LASF86
+ 747 0010 0C       		.byte	0xc
+ 748 0011 40050000 		.4byte	.LASF87
+ 749 0015 DE010000 		.4byte	.LASF88
+ 750 0019 18000000 		.4byte	.Ldebug_ranges0+0x18
+ 751 001d 00000000 		.4byte	0
+ 752 0021 00000000 		.4byte	.Ldebug_line0
+ 753 0025 02       		.uleb128 0x2
+ 754 0026 04       		.byte	0x4
+ 755 0027 07       		.byte	0x7
+ 756 0028 7C030000 		.4byte	.LASF0
+ 757 002c 03       		.uleb128 0x3
+ 758 002d 04       		.byte	0x4
+ 759 002e 05       		.byte	0x5
+ 760 002f 696E7400 		.ascii	"int\000"
+ 761 0033 02       		.uleb128 0x2
+ 762 0034 08       		.byte	0x8
+ 763 0035 05       		.byte	0x5
+ 764 0036 60020000 		.4byte	.LASF1
+ 765 003a 02       		.uleb128 0x2
+ 766 003b 08       		.byte	0x8
+ 767 003c 04       		.byte	0x4
+ 768 003d 29030000 		.4byte	.LASF2
+ 769 0041 02       		.uleb128 0x2
+ 770 0042 01       		.byte	0x1
+ 771 0043 06       		.byte	0x6
+ 772 0044 43030000 		.4byte	.LASF3
+ 773 0048 02       		.uleb128 0x2
+ 774 0049 01       		.byte	0x1
+ 775 004a 08       		.byte	0x8
+ 776 004b 35030000 		.4byte	.LASF4
+ 777 004f 02       		.uleb128 0x2
+ 778 0050 02       		.byte	0x2
+ 779 0051 05       		.byte	0x5
+ 780 0052 97000000 		.4byte	.LASF5
+ 781 0056 02       		.uleb128 0x2
+ 782 0057 02       		.byte	0x2
+ 783 0058 07       		.byte	0x7
+ 784 0059 CE030000 		.4byte	.LASF6
+ 785 005d 02       		.uleb128 0x2
+ 786 005e 04       		.byte	0x4
+ 787 005f 05       		.byte	0x5
+ 788 0060 92020000 		.4byte	.LASF7
+ 789 0064 04       		.uleb128 0x4
+ 790 0065 C2000000 		.4byte	.LASF12
+ 791 0069 02       		.byte	0x2
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 29
+
+
+ 792 006a 41       		.byte	0x41
+ 793 006b 6F000000 		.4byte	0x6f
+ 794 006f 02       		.uleb128 0x2
+ 795 0070 04       		.byte	0x4
+ 796 0071 07       		.byte	0x7
+ 797 0072 95040000 		.4byte	.LASF8
+ 798 0076 02       		.uleb128 0x2
+ 799 0077 08       		.byte	0x8
+ 800 0078 07       		.byte	0x7
+ 801 0079 4F030000 		.4byte	.LASF9
+ 802 007d 02       		.uleb128 0x2
+ 803 007e 04       		.byte	0x4
+ 804 007f 07       		.byte	0x7
+ 805 0080 FE040000 		.4byte	.LASF10
+ 806 0084 05       		.uleb128 0x5
+ 807 0085 04       		.byte	0x4
+ 808 0086 02       		.uleb128 0x2
+ 809 0087 01       		.byte	0x1
+ 810 0088 08       		.byte	0x8
+ 811 0089 09040000 		.4byte	.LASF11
+ 812 008d 04       		.uleb128 0x4
+ 813 008e 66030000 		.4byte	.LASF13
+ 814 0092 03       		.byte	0x3
+ 815 0093 30       		.byte	0x30
+ 816 0094 64000000 		.4byte	0x64
+ 817 0098 02       		.uleb128 0x2
+ 818 0099 04       		.byte	0x4
+ 819 009a 04       		.byte	0x4
+ 820 009b 34020000 		.4byte	.LASF14
+ 821 009f 02       		.uleb128 0x2
+ 822 00a0 08       		.byte	0x8
+ 823 00a1 04       		.byte	0x4
+ 824 00a2 2D050000 		.4byte	.LASF15
+ 825 00a6 04       		.uleb128 0x4
+ 826 00a7 94030000 		.4byte	.LASF16
+ 827 00ab 04       		.byte	0x4
+ 828 00ac 39       		.byte	0x39
+ 829 00ad 5D000000 		.4byte	0x5d
+ 830 00b1 04       		.uleb128 0x4
+ 831 00b2 A7040000 		.4byte	.LASF17
+ 832 00b6 04       		.byte	0x4
+ 833 00b7 3A       		.byte	0x3a
+ 834 00b8 6F000000 		.4byte	0x6f
+ 835 00bc 04       		.uleb128 0x4
+ 836 00bd 1E030000 		.4byte	.LASF18
+ 837 00c1 04       		.byte	0x4
+ 838 00c2 40       		.byte	0x40
+ 839 00c3 8D000000 		.4byte	0x8d
+ 840 00c7 06       		.uleb128 0x6
+ 841 00c8 FE020000 		.4byte	.LASF25
+ 842 00cc 14       		.byte	0x14
+ 843 00cd 05       		.byte	0x5
+ 844 00ce 8C       		.byte	0x8c
+ 845 00cf 10010000 		.4byte	0x110
+ 846 00d3 07       		.uleb128 0x7
+ 847 00d4 C2020000 		.4byte	.LASF19
+ 848 00d8 05       		.byte	0x5
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 30
+
+
+ 849 00d9 8F       		.byte	0x8f
+ 850 00da BC000000 		.4byte	0xbc
+ 851 00de 00       		.byte	0
+ 852 00df 07       		.uleb128 0x7
+ 853 00e0 0E040000 		.4byte	.LASF20
+ 854 00e4 05       		.byte	0x5
+ 855 00e5 90       		.byte	0x90
+ 856 00e6 10010000 		.4byte	0x110
+ 857 00ea 04       		.byte	0x4
+ 858 00eb 07       		.uleb128 0x7
+ 859 00ec AA000000 		.4byte	.LASF21
+ 860 00f0 05       		.byte	0x5
+ 861 00f1 91       		.byte	0x91
+ 862 00f2 10010000 		.4byte	0x110
+ 863 00f6 08       		.byte	0x8
+ 864 00f7 07       		.uleb128 0x7
+ 865 00f8 EB000000 		.4byte	.LASF22
+ 866 00fc 05       		.byte	0x5
+ 867 00fd 92       		.byte	0x92
+ 868 00fe 84000000 		.4byte	0x84
+ 869 0102 0C       		.byte	0xc
+ 870 0103 07       		.uleb128 0x7
+ 871 0104 9F030000 		.4byte	.LASF23
+ 872 0108 05       		.byte	0x5
+ 873 0109 93       		.byte	0x93
+ 874 010a 84000000 		.4byte	0x84
+ 875 010e 10       		.byte	0x10
+ 876 010f 00       		.byte	0
+ 877 0110 08       		.uleb128 0x8
+ 878 0111 04       		.byte	0x4
+ 879 0112 C7000000 		.4byte	0xc7
+ 880 0116 04       		.uleb128 0x4
+ 881 0117 89030000 		.4byte	.LASF24
+ 882 011b 05       		.byte	0x5
+ 883 011c 96       		.byte	0x96
+ 884 011d C7000000 		.4byte	0xc7
+ 885 0121 06       		.uleb128 0x6
+ 886 0122 91050000 		.4byte	.LASF26
+ 887 0126 0C       		.byte	0xc
+ 888 0127 05       		.byte	0x5
+ 889 0128 98       		.byte	0x98
+ 890 0129 52010000 		.4byte	0x152
+ 891 012d 07       		.uleb128 0x7
+ 892 012e C2020000 		.4byte	.LASF19
+ 893 0132 05       		.byte	0x5
+ 894 0133 9B       		.byte	0x9b
+ 895 0134 BC000000 		.4byte	0xbc
+ 896 0138 00       		.byte	0
+ 897 0139 07       		.uleb128 0x7
+ 898 013a 0E040000 		.4byte	.LASF20
+ 899 013e 05       		.byte	0x5
+ 900 013f 9C       		.byte	0x9c
+ 901 0140 10010000 		.4byte	0x110
+ 902 0144 04       		.byte	0x4
+ 903 0145 07       		.uleb128 0x7
+ 904 0146 AA000000 		.4byte	.LASF21
+ 905 014a 05       		.byte	0x5
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 31
+
+
+ 906 014b 9D       		.byte	0x9d
+ 907 014c 10010000 		.4byte	0x110
+ 908 0150 08       		.byte	0x8
+ 909 0151 00       		.byte	0
+ 910 0152 04       		.uleb128 0x4
+ 911 0153 51020000 		.4byte	.LASF27
+ 912 0157 05       		.byte	0x5
+ 913 0158 9F       		.byte	0x9f
+ 914 0159 21010000 		.4byte	0x121
+ 915 015d 06       		.uleb128 0x6
+ 916 015e 9B020000 		.4byte	.LASF28
+ 917 0162 14       		.byte	0x14
+ 918 0163 05       		.byte	0x5
+ 919 0164 A4       		.byte	0xa4
+ 920 0165 8E010000 		.4byte	0x18e
+ 921 0169 07       		.uleb128 0x7
+ 922 016a BD040000 		.4byte	.LASF29
+ 923 016e 05       		.byte	0x5
+ 924 016f A7       		.byte	0xa7
+ 925 0170 8E010000 		.4byte	0x18e
+ 926 0174 00       		.byte	0
+ 927 0175 07       		.uleb128 0x7
+ 928 0176 5D050000 		.4byte	.LASF30
+ 929 017a 05       		.byte	0x5
+ 930 017b A8       		.byte	0xa8
+ 931 017c 93010000 		.4byte	0x193
+ 932 0180 04       		.byte	0x4
+ 933 0181 07       		.uleb128 0x7
+ 934 0182 A1000000 		.4byte	.LASF31
+ 935 0186 05       		.byte	0x5
+ 936 0187 A9       		.byte	0xa9
+ 937 0188 52010000 		.4byte	0x152
+ 938 018c 08       		.byte	0x8
+ 939 018d 00       		.byte	0
+ 940 018e 09       		.uleb128 0x9
+ 941 018f B1000000 		.4byte	0xb1
+ 942 0193 08       		.uleb128 0x8
+ 943 0194 04       		.byte	0x4
+ 944 0195 16010000 		.4byte	0x116
+ 945 0199 04       		.uleb128 0x4
+ 946 019a 4A020000 		.4byte	.LASF32
+ 947 019e 05       		.byte	0x5
+ 948 019f AB       		.byte	0xab
+ 949 01a0 5D010000 		.4byte	0x15d
+ 950 01a4 04       		.uleb128 0x4
+ 951 01a5 8E010000 		.4byte	.LASF33
+ 952 01a9 06       		.byte	0x6
+ 953 01aa 52       		.byte	0x52
+ 954 01ab 84000000 		.4byte	0x84
+ 955 01af 04       		.uleb128 0x4
+ 956 01b0 CD000000 		.4byte	.LASF34
+ 957 01b4 06       		.byte	0x6
+ 958 01b5 5C       		.byte	0x5c
+ 959 01b6 BC000000 		.4byte	0xbc
+ 960 01ba 06       		.uleb128 0x6
+ 961 01bb A1020000 		.4byte	.LASF35
+ 962 01bf 18       		.byte	0x18
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 32
+
+
+ 963 01c0 01       		.byte	0x1
+ 964 01c1 40       		.byte	0x40
+ 965 01c2 DF010000 		.4byte	0x1df
+ 966 01c6 07       		.uleb128 0x7
+ 967 01c7 33040000 		.4byte	.LASF36
+ 968 01cb 01       		.byte	0x1
+ 969 01cc 42       		.byte	0x42
+ 970 01cd AF010000 		.4byte	0x1af
+ 971 01d1 00       		.byte	0
+ 972 01d2 07       		.uleb128 0x7
+ 973 01d3 D9020000 		.4byte	.LASF37
+ 974 01d7 01       		.byte	0x1
+ 975 01d8 43       		.byte	0x43
+ 976 01d9 99010000 		.4byte	0x199
+ 977 01dd 04       		.byte	0x4
+ 978 01de 00       		.byte	0
+ 979 01df 04       		.uleb128 0x4
+ 980 01e0 11060000 		.4byte	.LASF38
+ 981 01e4 01       		.byte	0x1
+ 982 01e5 4C       		.byte	0x4c
+ 983 01e6 BA010000 		.4byte	0x1ba
+ 984 01ea 0A       		.uleb128 0xa
+ 985 01eb F4030000 		.4byte	.LASF89
+ 986 01ef 01       		.byte	0x1
+ 987 01f0 9102     		.2byte	0x291
+ 988 01f2 A6000000 		.4byte	0xa6
+ 989 01f6 00000000 		.4byte	.LFB41
+ 990 01fa 1E000000 		.4byte	.LFE41-.LFB41
+ 991 01fe 01       		.uleb128 0x1
+ 992 01ff 9C       		.byte	0x9c
+ 993 0200 41020000 		.4byte	0x241
+ 994 0204 0B       		.uleb128 0xb
+ 995 0205 A1050000 		.4byte	.LASF39
+ 996 0209 01       		.byte	0x1
+ 997 020a 9102     		.2byte	0x291
+ 998 020c 41020000 		.4byte	0x241
+ 999 0210 00000000 		.4byte	.LLST0
+ 1000 0214 0C       		.uleb128 0xc
+ 1001 0215 3A020000 		.4byte	.LASF40
+ 1002 0219 01       		.byte	0x1
+ 1003 021a 9102     		.2byte	0x291
+ 1004 021c 41020000 		.4byte	0x241
+ 1005 0220 01       		.uleb128 0x1
+ 1006 0221 51       		.byte	0x51
+ 1007 0222 0C       		.uleb128 0xc
+ 1008 0223 53000000 		.4byte	.LASF41
+ 1009 0227 01       		.byte	0x1
+ 1010 0228 9102     		.2byte	0x291
+ 1011 022a 46020000 		.4byte	0x246
+ 1012 022e 01       		.uleb128 0x1
+ 1013 022f 52       		.byte	0x52
+ 1014 0230 0D       		.uleb128 0xd
+ 1015 0231 D9000000 		.4byte	.LASF42
+ 1016 0235 01       		.byte	0x1
+ 1017 0236 9302     		.2byte	0x293
+ 1018 0238 A6000000 		.4byte	0xa6
+ 1019 023c 53000000 		.4byte	.LLST1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 33
+
+
+ 1020 0240 00       		.byte	0
+ 1021 0241 0E       		.uleb128 0xe
+ 1022 0242 AF010000 		.4byte	0x1af
+ 1023 0246 0E       		.uleb128 0xe
+ 1024 0247 A6000000 		.4byte	0xa6
+ 1025 024b 0F       		.uleb128 0xf
+ 1026 024c 22000000 		.4byte	.LASF44
+ 1027 0250 01       		.byte	0x1
+ 1028 0251 8F       		.byte	0x8f
+ 1029 0252 A4010000 		.4byte	0x1a4
+ 1030 0256 00000000 		.4byte	.LFB32
+ 1031 025a 18000000 		.4byte	.LFE32-.LFB32
+ 1032 025e 01       		.uleb128 0x1
+ 1033 025f 9C       		.byte	0x9c
+ 1034 0260 97020000 		.4byte	0x297
+ 1035 0264 10       		.uleb128 0x10
+ 1036 0265 34050000 		.4byte	.LASF43
+ 1037 0269 01       		.byte	0x1
+ 1038 026a 91       		.byte	0x91
+ 1039 026b 97020000 		.4byte	0x297
+ 1040 026f 72000000 		.4byte	.LLST2
+ 1041 0273 11       		.uleb128 0x11
+ 1042 0274 08000000 		.4byte	.LVL7
+ 1043 0278 28080000 		.4byte	0x828
+ 1044 027c 86020000 		.4byte	0x286
+ 1045 0280 12       		.uleb128 0x12
+ 1046 0281 01       		.uleb128 0x1
+ 1047 0282 50       		.byte	0x50
+ 1048 0283 01       		.uleb128 0x1
+ 1049 0284 48       		.byte	0x48
+ 1050 0285 00       		.byte	0
+ 1051 0286 13       		.uleb128 0x13
+ 1052 0287 14000000 		.4byte	.LVL10
+ 1053 028b 33080000 		.4byte	0x833
+ 1054 028f 12       		.uleb128 0x12
+ 1055 0290 01       		.uleb128 0x1
+ 1056 0291 50       		.byte	0x50
+ 1057 0292 02       		.uleb128 0x2
+ 1058 0293 74       		.byte	0x74
+ 1059 0294 04       		.sleb128 4
+ 1060 0295 00       		.byte	0
+ 1061 0296 00       		.byte	0
+ 1062 0297 08       		.uleb128 0x8
+ 1063 0298 04       		.byte	0x4
+ 1064 0299 DF010000 		.4byte	0x1df
+ 1065 029d 14       		.uleb128 0x14
+ 1066 029e AB030000 		.4byte	.LASF45
+ 1067 02a2 01       		.byte	0x1
+ 1068 02a3 2901     		.2byte	0x129
+ 1069 02a5 AF010000 		.4byte	0x1af
+ 1070 02a9 00000000 		.4byte	.LFB34
+ 1071 02ad A8000000 		.4byte	.LFE34-.LFB34
+ 1072 02b1 01       		.uleb128 0x1
+ 1073 02b2 9C       		.byte	0x9c
+ 1074 02b3 11040000 		.4byte	0x411
+ 1075 02b7 0B       		.uleb128 0xb
+ 1076 02b8 13050000 		.4byte	.LASF46
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 34
+
+
+ 1077 02bc 01       		.byte	0x1
+ 1078 02bd 2901     		.2byte	0x129
+ 1079 02bf A4010000 		.4byte	0x1a4
+ 1080 02c3 9B000000 		.4byte	.LLST3
+ 1081 02c7 0B       		.uleb128 0xb
+ 1082 02c8 3A020000 		.4byte	.LASF40
+ 1083 02cc 01       		.byte	0x1
+ 1084 02cd 2901     		.2byte	0x129
+ 1085 02cf 41020000 		.4byte	0x241
+ 1086 02d3 C7000000 		.4byte	.LLST4
+ 1087 02d7 0B       		.uleb128 0xb
+ 1088 02d8 B5000000 		.4byte	.LASF47
+ 1089 02dc 01       		.byte	0x1
+ 1090 02dd 2901     		.2byte	0x129
+ 1091 02df 46020000 		.4byte	0x246
+ 1092 02e3 F3000000 		.4byte	.LLST5
+ 1093 02e7 0B       		.uleb128 0xb
+ 1094 02e8 53000000 		.4byte	.LASF41
+ 1095 02ec 01       		.byte	0x1
+ 1096 02ed 2901     		.2byte	0x129
+ 1097 02ef 46020000 		.4byte	0x246
+ 1098 02f3 1F010000 		.4byte	.LLST6
+ 1099 02f7 0B       		.uleb128 0xb
+ 1100 02f8 F3000000 		.4byte	.LASF48
+ 1101 02fc 01       		.byte	0x1
+ 1102 02fd 2901     		.2byte	0x129
+ 1103 02ff BC000000 		.4byte	0xbc
+ 1104 0303 3E010000 		.4byte	.LLST7
+ 1105 0307 0D       		.uleb128 0xd
+ 1106 0308 34050000 		.4byte	.LASF43
+ 1107 030c 01       		.byte	0x1
+ 1108 030d 2B01     		.2byte	0x12b
+ 1109 030f 97020000 		.4byte	0x297
+ 1110 0313 82010000 		.4byte	.LLST8
+ 1111 0317 0D       		.uleb128 0xd
+ 1112 0318 8C040000 		.4byte	.LASF49
+ 1113 031c 01       		.byte	0x1
+ 1114 031d 2C01     		.2byte	0x12c
+ 1115 031f AF010000 		.4byte	0x1af
+ 1116 0323 AE010000 		.4byte	.LLST9
+ 1117 0327 0D       		.uleb128 0xd
+ 1118 0328 51040000 		.4byte	.LASF50
+ 1119 032c 01       		.byte	0x1
+ 1120 032d 2C01     		.2byte	0x12c
+ 1121 032f AF010000 		.4byte	0x1af
+ 1122 0333 04020000 		.4byte	.LLST10
+ 1123 0337 0D       		.uleb128 0xd
+ 1124 0338 D9000000 		.4byte	.LASF42
+ 1125 033c 01       		.byte	0x1
+ 1126 033d 2D01     		.2byte	0x12d
+ 1127 033f A6000000 		.4byte	0xa6
+ 1128 0343 2F020000 		.4byte	.LLST11
+ 1129 0347 0D       		.uleb128 0xd
+ 1130 0348 E7050000 		.4byte	.LASF51
+ 1131 034c 01       		.byte	0x1
+ 1132 034d 2D01     		.2byte	0x12d
+ 1133 034f A6000000 		.4byte	0xa6
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 35
+
+
+ 1134 0353 4D020000 		.4byte	.LLST12
+ 1135 0357 0D       		.uleb128 0xd
+ 1136 0358 65050000 		.4byte	.LASF52
+ 1137 035c 01       		.byte	0x1
+ 1138 035d 2E01     		.2byte	0x12e
+ 1139 035f A6000000 		.4byte	0xa6
+ 1140 0363 60020000 		.4byte	.LLST13
+ 1141 0367 15       		.uleb128 0x15
+ 1142 0368 00000000 		.4byte	.Ldebug_ranges0+0
+ 1143 036c B9030000 		.4byte	0x3b9
+ 1144 0370 0D       		.uleb128 0xd
+ 1145 0371 A1050000 		.4byte	.LASF39
+ 1146 0375 01       		.byte	0x1
+ 1147 0376 3D01     		.2byte	0x13d
+ 1148 0378 41020000 		.4byte	0x241
+ 1149 037c 80020000 		.4byte	.LLST14
+ 1150 0380 11       		.uleb128 0x11
+ 1151 0381 1C000000 		.4byte	.LVL16
+ 1152 0385 EA010000 		.4byte	0x1ea
+ 1153 0389 A1030000 		.4byte	0x3a1
+ 1154 038d 12       		.uleb128 0x12
+ 1155 038e 01       		.uleb128 0x1
+ 1156 038f 50       		.byte	0x50
+ 1157 0390 02       		.uleb128 0x2
+ 1158 0391 74       		.byte	0x74
+ 1159 0392 00       		.sleb128 0
+ 1160 0393 12       		.uleb128 0x12
+ 1161 0394 01       		.uleb128 0x1
+ 1162 0395 51       		.byte	0x51
+ 1163 0396 02       		.uleb128 0x2
+ 1164 0397 75       		.byte	0x75
+ 1165 0398 00       		.sleb128 0
+ 1166 0399 12       		.uleb128 0x12
+ 1167 039a 01       		.uleb128 0x1
+ 1168 039b 52       		.byte	0x52
+ 1169 039c 03       		.uleb128 0x3
+ 1170 039d 91       		.byte	0x91
+ 1171 039e 64       		.sleb128 -28
+ 1172 039f 06       		.byte	0x6
+ 1173 03a0 00       		.byte	0
+ 1174 03a1 13       		.uleb128 0x13
+ 1175 03a2 58000000 		.4byte	.LVL23
+ 1176 03a6 3F080000 		.4byte	0x83f
+ 1177 03aa 12       		.uleb128 0x12
+ 1178 03ab 01       		.uleb128 0x1
+ 1179 03ac 50       		.byte	0x50
+ 1180 03ad 02       		.uleb128 0x2
+ 1181 03ae 77       		.byte	0x77
+ 1182 03af 04       		.sleb128 4
+ 1183 03b0 12       		.uleb128 0x12
+ 1184 03b1 01       		.uleb128 0x1
+ 1185 03b2 52       		.byte	0x52
+ 1186 03b3 03       		.uleb128 0x3
+ 1187 03b4 91       		.byte	0x91
+ 1188 03b5 00       		.sleb128 0
+ 1189 03b6 06       		.byte	0x6
+ 1190 03b7 00       		.byte	0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 36
+
+
+ 1191 03b8 00       		.byte	0
+ 1192 03b9 16       		.uleb128 0x16
+ 1193 03ba 10000000 		.4byte	.LVL14
+ 1194 03be 4B080000 		.4byte	0x84b
+ 1195 03c2 16       		.uleb128 0x16
+ 1196 03c3 64000000 		.4byte	.LVL27
+ 1197 03c7 57080000 		.4byte	0x857
+ 1198 03cb 16       		.uleb128 0x16
+ 1199 03cc 72000000 		.4byte	.LVL28
+ 1200 03d0 63080000 		.4byte	0x863
+ 1201 03d4 16       		.uleb128 0x16
+ 1202 03d5 76000000 		.4byte	.LVL29
+ 1203 03d9 6E080000 		.4byte	0x86e
+ 1204 03dd 16       		.uleb128 0x16
+ 1205 03de 80000000 		.4byte	.LVL31
+ 1206 03e2 7A080000 		.4byte	0x87a
+ 1207 03e6 11       		.uleb128 0x11
+ 1208 03e7 8C000000 		.4byte	.LVL33
+ 1209 03eb EA010000 		.4byte	0x1ea
+ 1210 03ef 07040000 		.4byte	0x407
+ 1211 03f3 12       		.uleb128 0x12
+ 1212 03f4 01       		.uleb128 0x1
+ 1213 03f5 50       		.byte	0x50
+ 1214 03f6 02       		.uleb128 0x2
+ 1215 03f7 74       		.byte	0x74
+ 1216 03f8 00       		.sleb128 0
+ 1217 03f9 12       		.uleb128 0x12
+ 1218 03fa 01       		.uleb128 0x1
+ 1219 03fb 51       		.byte	0x51
+ 1220 03fc 02       		.uleb128 0x2
+ 1221 03fd 75       		.byte	0x75
+ 1222 03fe 00       		.sleb128 0
+ 1223 03ff 12       		.uleb128 0x12
+ 1224 0400 01       		.uleb128 0x1
+ 1225 0401 52       		.byte	0x52
+ 1226 0402 03       		.uleb128 0x3
+ 1227 0403 91       		.byte	0x91
+ 1228 0404 64       		.sleb128 -28
+ 1229 0405 06       		.byte	0x6
+ 1230 0406 00       		.byte	0
+ 1231 0407 16       		.uleb128 0x16
+ 1232 0408 9E000000 		.4byte	.LVL35
+ 1233 040c 85080000 		.4byte	0x885
+ 1234 0410 00       		.byte	0
+ 1235 0411 14       		.uleb128 0x14
+ 1236 0412 09030000 		.4byte	.LASF53
+ 1237 0416 01       		.byte	0x1
+ 1238 0417 BF01     		.2byte	0x1bf
+ 1239 0419 AF010000 		.4byte	0x1af
+ 1240 041d 00000000 		.4byte	.LFB35
+ 1241 0421 1A000000 		.4byte	.LFE35-.LFB35
+ 1242 0425 01       		.uleb128 0x1
+ 1243 0426 9C       		.byte	0x9c
+ 1244 0427 7E040000 		.4byte	0x47e
+ 1245 042b 0B       		.uleb128 0xb
+ 1246 042c 13050000 		.4byte	.LASF46
+ 1247 0430 01       		.byte	0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 37
+
+
+ 1248 0431 BF01     		.2byte	0x1bf
+ 1249 0433 A4010000 		.4byte	0x1a4
+ 1250 0437 9E020000 		.4byte	.LLST15
+ 1251 043b 0B       		.uleb128 0xb
+ 1252 043c 1F050000 		.4byte	.LASF54
+ 1253 0440 01       		.byte	0x1
+ 1254 0441 BF01     		.2byte	0x1bf
+ 1255 0443 41020000 		.4byte	0x241
+ 1256 0447 CA020000 		.4byte	.LLST16
+ 1257 044b 0D       		.uleb128 0xd
+ 1258 044c 34050000 		.4byte	.LASF43
+ 1259 0450 01       		.byte	0x1
+ 1260 0451 C101     		.2byte	0x1c1
+ 1261 0453 97020000 		.4byte	0x297
+ 1262 0457 F6020000 		.4byte	.LLST17
+ 1263 045b 0D       		.uleb128 0xd
+ 1264 045c 8C040000 		.4byte	.LASF49
+ 1265 0460 01       		.byte	0x1
+ 1266 0461 C201     		.2byte	0x1c2
+ 1267 0463 AF010000 		.4byte	0x1af
+ 1268 0467 22030000 		.4byte	.LLST18
+ 1269 046b 16       		.uleb128 0x16
+ 1270 046c 0A000000 		.4byte	.LVL44
+ 1271 0470 7A080000 		.4byte	0x87a
+ 1272 0474 16       		.uleb128 0x16
+ 1273 0475 16000000 		.4byte	.LVL46
+ 1274 0479 85080000 		.4byte	0x885
+ 1275 047d 00       		.byte	0
+ 1276 047e 14       		.uleb128 0x14
+ 1277 047f 5F040000 		.4byte	.LASF55
+ 1278 0483 01       		.byte	0x1
+ 1279 0484 E901     		.2byte	0x1e9
+ 1280 0486 AF010000 		.4byte	0x1af
+ 1281 048a 00000000 		.4byte	.LFB36
+ 1282 048e 12000000 		.4byte	.LFE36-.LFB36
+ 1283 0492 01       		.uleb128 0x1
+ 1284 0493 9C       		.byte	0x9c
+ 1285 0494 EB040000 		.4byte	0x4eb
+ 1286 0498 0B       		.uleb128 0xb
+ 1287 0499 13050000 		.4byte	.LASF46
+ 1288 049d 01       		.byte	0x1
+ 1289 049e E901     		.2byte	0x1e9
+ 1290 04a0 A4010000 		.4byte	0x1a4
+ 1291 04a4 40030000 		.4byte	.LLST19
+ 1292 04a8 0D       		.uleb128 0xd
+ 1293 04a9 E7040000 		.4byte	.LASF56
+ 1294 04ad 01       		.byte	0x1
+ 1295 04ae EB01     		.2byte	0x1eb
+ 1296 04b0 B1000000 		.4byte	0xb1
+ 1297 04b4 6C030000 		.4byte	.LLST20
+ 1298 04b8 0D       		.uleb128 0xd
+ 1299 04b9 34050000 		.4byte	.LASF43
+ 1300 04bd 01       		.byte	0x1
+ 1301 04be EC01     		.2byte	0x1ec
+ 1302 04c0 97020000 		.4byte	0x297
+ 1303 04c4 7F030000 		.4byte	.LLST21
+ 1304 04c8 0D       		.uleb128 0xd
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 38
+
+
+ 1305 04c9 8C040000 		.4byte	.LASF49
+ 1306 04cd 01       		.byte	0x1
+ 1307 04ce ED01     		.2byte	0x1ed
+ 1308 04d0 AF010000 		.4byte	0x1af
+ 1309 04d4 AB030000 		.4byte	.LLST22
+ 1310 04d8 16       		.uleb128 0x16
+ 1311 04d9 08000000 		.4byte	.LVL52
+ 1312 04dd 90080000 		.4byte	0x890
+ 1313 04e1 16       		.uleb128 0x16
+ 1314 04e2 0E000000 		.4byte	.LVL54
+ 1315 04e6 9B080000 		.4byte	0x89b
+ 1316 04ea 00       		.byte	0
+ 1317 04eb 14       		.uleb128 0x14
+ 1318 04ec 79040000 		.4byte	.LASF57
+ 1319 04f0 01       		.byte	0x1
+ 1320 04f1 F901     		.2byte	0x1f9
+ 1321 04f3 AF010000 		.4byte	0x1af
+ 1322 04f7 00000000 		.4byte	.LFB37
+ 1323 04fb 6C000000 		.4byte	.LFE37-.LFB37
+ 1324 04ff 01       		.uleb128 0x1
+ 1325 0500 9C       		.byte	0x9c
+ 1326 0501 D1050000 		.4byte	0x5d1
+ 1327 0505 0B       		.uleb128 0xb
+ 1328 0506 13050000 		.4byte	.LASF46
+ 1329 050a 01       		.byte	0x1
+ 1330 050b F901     		.2byte	0x1f9
+ 1331 050d A4010000 		.4byte	0x1a4
+ 1332 0511 C9030000 		.4byte	.LLST23
+ 1333 0515 0B       		.uleb128 0xb
+ 1334 0516 F7050000 		.4byte	.LASF58
+ 1335 051a 01       		.byte	0x1
+ 1336 051b F901     		.2byte	0x1f9
+ 1337 051d 41020000 		.4byte	0x241
+ 1338 0521 02040000 		.4byte	.LLST24
+ 1339 0525 0D       		.uleb128 0xd
+ 1340 0526 B7020000 		.4byte	.LASF59
+ 1341 052a 01       		.byte	0x1
+ 1342 052b FB01     		.2byte	0x1fb
+ 1343 052d 93010000 		.4byte	0x193
+ 1344 0531 2E040000 		.4byte	.LLST25
+ 1345 0535 0D       		.uleb128 0xd
+ 1346 0536 0E040000 		.4byte	.LASF20
+ 1347 053a 01       		.byte	0x1
+ 1348 053b FB01     		.2byte	0x1fb
+ 1349 053d 93010000 		.4byte	0x193
+ 1350 0541 4C040000 		.4byte	.LLST26
+ 1351 0545 0D       		.uleb128 0xd
+ 1352 0546 63000000 		.4byte	.LASF60
+ 1353 054a 01       		.byte	0x1
+ 1354 054b FC01     		.2byte	0x1fc
+ 1355 054d D1050000 		.4byte	0x5d1
+ 1356 0551 5F040000 		.4byte	.LLST27
+ 1357 0555 0D       		.uleb128 0xd
+ 1358 0556 8B020000 		.4byte	.LASF61
+ 1359 055a 01       		.byte	0x1
+ 1360 055b FD01     		.2byte	0x1fd
+ 1361 055d DC050000 		.4byte	0x5dc
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 39
+
+
+ 1362 0561 82040000 		.4byte	.LLST28
+ 1363 0565 0D       		.uleb128 0xd
+ 1364 0566 1F050000 		.4byte	.LASF54
+ 1365 056a 01       		.byte	0x1
+ 1366 056b FE01     		.2byte	0x1fe
+ 1367 056d AF010000 		.4byte	0x1af
+ 1368 0571 C1040000 		.4byte	.LLST29
+ 1369 0575 0D       		.uleb128 0xd
+ 1370 0576 BC010000 		.4byte	.LASF62
+ 1371 057a 01       		.byte	0x1
+ 1372 057b FE01     		.2byte	0x1fe
+ 1373 057d AF010000 		.4byte	0x1af
+ 1374 0581 E0040000 		.4byte	.LLST30
+ 1375 0585 0D       		.uleb128 0xd
+ 1376 0586 51040000 		.4byte	.LASF50
+ 1377 058a 01       		.byte	0x1
+ 1378 058b FE01     		.2byte	0x1fe
+ 1379 058d AF010000 		.4byte	0x1af
+ 1380 0591 10050000 		.4byte	.LLST31
+ 1381 0595 0D       		.uleb128 0xd
+ 1382 0596 34050000 		.4byte	.LASF43
+ 1383 059a 01       		.byte	0x1
+ 1384 059b FF01     		.2byte	0x1ff
+ 1385 059d 97020000 		.4byte	0x297
+ 1386 05a1 3D050000 		.4byte	.LLST32
+ 1387 05a5 0D       		.uleb128 0xd
+ 1388 05a6 07050000 		.4byte	.LASF63
+ 1389 05aa 01       		.byte	0x1
+ 1390 05ab 0002     		.2byte	0x200
+ 1391 05ad A6000000 		.4byte	0xa6
+ 1392 05b1 76050000 		.4byte	.LLST33
+ 1393 05b5 16       		.uleb128 0x16
+ 1394 05b6 0E000000 		.4byte	.LVL59
+ 1395 05ba 4B080000 		.4byte	0x84b
+ 1396 05be 16       		.uleb128 0x16
+ 1397 05bf 58000000 		.4byte	.LVL71
+ 1398 05c3 A6080000 		.4byte	0x8a6
+ 1399 05c7 16       		.uleb128 0x16
+ 1400 05c8 68000000 		.4byte	.LVL73
+ 1401 05cc 57080000 		.4byte	0x857
+ 1402 05d0 00       		.byte	0
+ 1403 05d1 08       		.uleb128 0x8
+ 1404 05d2 04       		.byte	0x4
+ 1405 05d3 D7050000 		.4byte	0x5d7
+ 1406 05d7 0E       		.uleb128 0xe
+ 1407 05d8 16010000 		.4byte	0x116
+ 1408 05dc 08       		.uleb128 0x8
+ 1409 05dd 04       		.byte	0x4
+ 1410 05de 99010000 		.4byte	0x199
+ 1411 05e2 0F       		.uleb128 0xf
+ 1412 05e3 EE020000 		.4byte	.LASF64
+ 1413 05e7 01       		.byte	0x1
+ 1414 05e8 B1       		.byte	0xb1
+ 1415 05e9 AF010000 		.4byte	0x1af
+ 1416 05ed 00000000 		.4byte	.LFB33
+ 1417 05f1 84000000 		.4byte	.LFE33-.LFB33
+ 1418 05f5 01       		.uleb128 0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 40
+
+
+ 1419 05f6 9C       		.byte	0x9c
+ 1420 05f7 F8060000 		.4byte	0x6f8
+ 1421 05fb 17       		.uleb128 0x17
+ 1422 05fc 13050000 		.4byte	.LASF46
+ 1423 0600 01       		.byte	0x1
+ 1424 0601 B1       		.byte	0xb1
+ 1425 0602 A4010000 		.4byte	0x1a4
+ 1426 0606 A1050000 		.4byte	.LLST34
+ 1427 060a 17       		.uleb128 0x17
+ 1428 060b F7050000 		.4byte	.LASF58
+ 1429 060f 01       		.byte	0x1
+ 1430 0610 B1       		.byte	0xb1
+ 1431 0611 41020000 		.4byte	0x241
+ 1432 0615 CD050000 		.4byte	.LLST35
+ 1433 0619 17       		.uleb128 0x17
+ 1434 061a 3A020000 		.4byte	.LASF40
+ 1435 061e 01       		.byte	0x1
+ 1436 061f B1       		.byte	0xb1
+ 1437 0620 41020000 		.4byte	0x241
+ 1438 0624 EC050000 		.4byte	.LLST36
+ 1439 0628 17       		.uleb128 0x17
+ 1440 0629 F3000000 		.4byte	.LASF48
+ 1441 062d 01       		.byte	0x1
+ 1442 062e B1       		.byte	0xb1
+ 1443 062f BC000000 		.4byte	0xbc
+ 1444 0633 18060000 		.4byte	.LLST37
+ 1445 0637 10       		.uleb128 0x10
+ 1446 0638 20040000 		.4byte	.LASF65
+ 1447 063c 01       		.byte	0x1
+ 1448 063d B3       		.byte	0xb3
+ 1449 063e AF010000 		.4byte	0x1af
+ 1450 0642 4D060000 		.4byte	.LLST38
+ 1451 0646 10       		.uleb128 0x10
+ 1452 0647 8C040000 		.4byte	.LASF49
+ 1453 064b 01       		.byte	0x1
+ 1454 064c B3       		.byte	0xb3
+ 1455 064d AF010000 		.4byte	0x1af
+ 1456 0651 60060000 		.4byte	.LLST39
+ 1457 0655 10       		.uleb128 0x10
+ 1458 0656 34050000 		.4byte	.LASF43
+ 1459 065a 01       		.byte	0x1
+ 1460 065b B4       		.byte	0xb4
+ 1461 065c 97020000 		.4byte	0x297
+ 1462 0660 B6060000 		.4byte	.LLST40
+ 1463 0664 10       		.uleb128 0x10
+ 1464 0665 E7050000 		.4byte	.LASF51
+ 1465 0669 01       		.byte	0x1
+ 1466 066a B5       		.byte	0xb5
+ 1467 066b A6000000 		.4byte	0xa6
+ 1468 066f E2060000 		.4byte	.LLST41
+ 1469 0673 10       		.uleb128 0x10
+ 1470 0674 65050000 		.4byte	.LASF52
+ 1471 0678 01       		.byte	0x1
+ 1472 0679 B6       		.byte	0xb6
+ 1473 067a A6000000 		.4byte	0xa6
+ 1474 067e F5060000 		.4byte	.LLST42
+ 1475 0682 16       		.uleb128 0x16
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 41
+
+
+ 1476 0683 10000000 		.4byte	.LVL79
+ 1477 0687 4B080000 		.4byte	0x84b
+ 1478 068b 11       		.uleb128 0x11
+ 1479 068c 1A000000 		.4byte	.LVL81
+ 1480 0690 EB040000 		.4byte	0x4eb
+ 1481 0694 A6060000 		.4byte	0x6a6
+ 1482 0698 12       		.uleb128 0x12
+ 1483 0699 01       		.uleb128 0x1
+ 1484 069a 50       		.byte	0x50
+ 1485 069b 02       		.uleb128 0x2
+ 1486 069c 76       		.byte	0x76
+ 1487 069d 00       		.sleb128 0
+ 1488 069e 12       		.uleb128 0x12
+ 1489 069f 01       		.uleb128 0x1
+ 1490 06a0 51       		.byte	0x51
+ 1491 06a1 03       		.uleb128 0x3
+ 1492 06a2 91       		.byte	0x91
+ 1493 06a3 64       		.sleb128 -28
+ 1494 06a4 06       		.byte	0x6
+ 1495 06a5 00       		.byte	0
+ 1496 06a6 11       		.uleb128 0x11
+ 1497 06a7 42000000 		.4byte	.LVL86
+ 1498 06ab 3F080000 		.4byte	0x83f
+ 1499 06af CA060000 		.4byte	0x6ca
+ 1500 06b3 12       		.uleb128 0x12
+ 1501 06b4 01       		.uleb128 0x1
+ 1502 06b5 50       		.byte	0x50
+ 1503 06b6 02       		.uleb128 0x2
+ 1504 06b7 76       		.byte	0x76
+ 1505 06b8 04       		.sleb128 4
+ 1506 06b9 12       		.uleb128 0x12
+ 1507 06ba 01       		.uleb128 0x1
+ 1508 06bb 51       		.byte	0x51
+ 1509 06bc 06       		.uleb128 0x6
+ 1510 06bd 77       		.byte	0x77
+ 1511 06be 00       		.sleb128 0
+ 1512 06bf 44       		.byte	0x44
+ 1513 06c0 46       		.byte	0x46
+ 1514 06c1 24       		.byte	0x24
+ 1515 06c2 21       		.byte	0x21
+ 1516 06c3 12       		.uleb128 0x12
+ 1517 06c4 01       		.uleb128 0x1
+ 1518 06c5 52       		.byte	0x52
+ 1519 06c6 02       		.uleb128 0x2
+ 1520 06c7 75       		.byte	0x75
+ 1521 06c8 00       		.sleb128 0
+ 1522 06c9 00       		.byte	0
+ 1523 06ca 16       		.uleb128 0x16
+ 1524 06cb 4C000000 		.4byte	.LVL89
+ 1525 06cf 57080000 		.4byte	0x857
+ 1526 06d3 16       		.uleb128 0x16
+ 1527 06d4 58000000 		.4byte	.LVL90
+ 1528 06d8 63080000 		.4byte	0x863
+ 1529 06dc 16       		.uleb128 0x16
+ 1530 06dd 5C000000 		.4byte	.LVL91
+ 1531 06e1 6E080000 		.4byte	0x86e
+ 1532 06e5 16       		.uleb128 0x16
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 42
+
+
+ 1533 06e6 66000000 		.4byte	.LVL93
+ 1534 06ea 7A080000 		.4byte	0x87a
+ 1535 06ee 16       		.uleb128 0x16
+ 1536 06ef 7A000000 		.4byte	.LVL95
+ 1537 06f3 85080000 		.4byte	0x885
+ 1538 06f7 00       		.byte	0
+ 1539 06f8 18       		.uleb128 0x18
+ 1540 06f9 CC010000 		.4byte	.LASF67
+ 1541 06fd 01       		.byte	0x1
+ 1542 06fe 5702     		.2byte	0x257
+ 1543 0700 00000000 		.4byte	.LFB38
+ 1544 0704 26000000 		.4byte	.LFE38-.LFB38
+ 1545 0708 01       		.uleb128 0x1
+ 1546 0709 9C       		.byte	0x9c
+ 1547 070a 7A070000 		.4byte	0x77a
+ 1548 070e 0B       		.uleb128 0xb
+ 1549 070f 13050000 		.4byte	.LASF46
+ 1550 0713 01       		.byte	0x1
+ 1551 0714 5702     		.2byte	0x257
+ 1552 0716 A4010000 		.4byte	0x1a4
+ 1553 071a 09070000 		.4byte	.LLST43
+ 1554 071e 0D       		.uleb128 0xd
+ 1555 071f 34050000 		.4byte	.LASF43
+ 1556 0723 01       		.byte	0x1
+ 1557 0724 5902     		.2byte	0x259
+ 1558 0726 97020000 		.4byte	0x297
+ 1559 072a 35070000 		.4byte	.LLST44
+ 1560 072e 0D       		.uleb128 0xd
+ 1561 072f C1050000 		.4byte	.LASF66
+ 1562 0733 01       		.byte	0x1
+ 1563 0734 5A02     		.2byte	0x25a
+ 1564 0736 7A070000 		.4byte	0x77a
+ 1565 073a 61070000 		.4byte	.LLST45
+ 1566 073e 16       		.uleb128 0x16
+ 1567 073f 08000000 		.4byte	.LVL104
+ 1568 0743 4B080000 		.4byte	0x84b
+ 1569 0747 11       		.uleb128 0x11
+ 1570 0748 14000000 		.4byte	.LVL105
+ 1571 074c A6080000 		.4byte	0x8a6
+ 1572 0750 5C070000 		.4byte	0x75c
+ 1573 0754 12       		.uleb128 0x12
+ 1574 0755 01       		.uleb128 0x1
+ 1575 0756 51       		.byte	0x51
+ 1576 0757 03       		.uleb128 0x3
+ 1577 0758 40       		.byte	0x40
+ 1578 0759 45       		.byte	0x45
+ 1579 075a 24       		.byte	0x24
+ 1580 075b 00       		.byte	0
+ 1581 075c 11       		.uleb128 0x11
+ 1582 075d 20000000 		.4byte	.LVL106
+ 1583 0761 B2080000 		.4byte	0x8b2
+ 1584 0765 70070000 		.4byte	0x770
+ 1585 0769 12       		.uleb128 0x12
+ 1586 076a 01       		.uleb128 0x1
+ 1587 076b 50       		.byte	0x50
+ 1588 076c 02       		.uleb128 0x2
+ 1589 076d 74       		.byte	0x74
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 43
+
+
+ 1590 076e 00       		.sleb128 0
+ 1591 076f 00       		.byte	0
+ 1592 0770 16       		.uleb128 0x16
+ 1593 0771 24000000 		.4byte	.LVL107
+ 1594 0775 57080000 		.4byte	0x857
+ 1595 0779 00       		.byte	0
+ 1596 077a 08       		.uleb128 0x8
+ 1597 077b 04       		.byte	0x4
+ 1598 077c 80070000 		.4byte	0x780
+ 1599 0780 0E       		.uleb128 0xe
+ 1600 0781 99010000 		.4byte	0x199
+ 1601 0785 18       		.uleb128 0x18
+ 1602 0786 76050000 		.4byte	.LASF68
+ 1603 078a 01       		.byte	0x1
+ 1604 078b 8302     		.2byte	0x283
+ 1605 078d 00000000 		.4byte	.LFB39
+ 1606 0791 08000000 		.4byte	.LFE39-.LFB39
+ 1607 0795 01       		.uleb128 0x1
+ 1608 0796 9C       		.byte	0x9c
+ 1609 0797 D4070000 		.4byte	0x7d4
+ 1610 079b 0B       		.uleb128 0xb
+ 1611 079c 6F030000 		.4byte	.LASF69
+ 1612 07a0 01       		.byte	0x1
+ 1613 07a1 8302     		.2byte	0x283
+ 1614 07a3 84000000 		.4byte	0x84
+ 1615 07a7 93070000 		.4byte	.LLST46
+ 1616 07ab 0B       		.uleb128 0xb
+ 1617 07ac CD020000 		.4byte	.LASF70
+ 1618 07b0 01       		.byte	0x1
+ 1619 07b1 8302     		.2byte	0x283
+ 1620 07b3 D4070000 		.4byte	0x7d4
+ 1621 07b7 B4070000 		.4byte	.LLST47
+ 1622 07bb 13       		.uleb128 0x13
+ 1623 07bc 06000000 		.4byte	.LVL110
+ 1624 07c0 EB040000 		.4byte	0x4eb
+ 1625 07c4 12       		.uleb128 0x12
+ 1626 07c5 01       		.uleb128 0x1
+ 1627 07c6 50       		.byte	0x50
+ 1628 07c7 03       		.uleb128 0x3
+ 1629 07c8 F3       		.byte	0xf3
+ 1630 07c9 01       		.uleb128 0x1
+ 1631 07ca 50       		.byte	0x50
+ 1632 07cb 12       		.uleb128 0x12
+ 1633 07cc 01       		.uleb128 0x1
+ 1634 07cd 51       		.byte	0x51
+ 1635 07ce 03       		.uleb128 0x3
+ 1636 07cf F3       		.byte	0xf3
+ 1637 07d0 01       		.uleb128 0x1
+ 1638 07d1 51       		.byte	0x51
+ 1639 07d2 00       		.byte	0
+ 1640 07d3 00       		.byte	0
+ 1641 07d4 0E       		.uleb128 0xe
+ 1642 07d5 8D000000 		.4byte	0x8d
+ 1643 07d9 18       		.uleb128 0x18
+ 1644 07da 6E020000 		.4byte	.LASF71
+ 1645 07de 01       		.byte	0x1
+ 1646 07df 8B02     		.2byte	0x28b
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 44
+
+
+ 1647 07e1 00000000 		.4byte	.LFB40
+ 1648 07e5 08000000 		.4byte	.LFE40-.LFB40
+ 1649 07e9 01       		.uleb128 0x1
+ 1650 07ea 9C       		.byte	0x9c
+ 1651 07eb 28080000 		.4byte	0x828
+ 1652 07ef 0B       		.uleb128 0xb
+ 1653 07f0 6F030000 		.4byte	.LASF69
+ 1654 07f4 01       		.byte	0x1
+ 1655 07f5 8B02     		.2byte	0x28b
+ 1656 07f7 84000000 		.4byte	0x84
+ 1657 07fb D5070000 		.4byte	.LLST48
+ 1658 07ff 0B       		.uleb128 0xb
+ 1659 0800 03060000 		.4byte	.LASF72
+ 1660 0804 01       		.byte	0x1
+ 1661 0805 8B02     		.2byte	0x28b
+ 1662 0807 D4070000 		.4byte	0x7d4
+ 1663 080b F6070000 		.4byte	.LLST49
+ 1664 080f 13       		.uleb128 0x13
+ 1665 0810 06000000 		.4byte	.LVL112
+ 1666 0814 11040000 		.4byte	0x411
+ 1667 0818 12       		.uleb128 0x12
+ 1668 0819 01       		.uleb128 0x1
+ 1669 081a 50       		.byte	0x50
+ 1670 081b 03       		.uleb128 0x3
+ 1671 081c F3       		.byte	0xf3
+ 1672 081d 01       		.uleb128 0x1
+ 1673 081e 50       		.byte	0x50
+ 1674 081f 12       		.uleb128 0x12
+ 1675 0820 01       		.uleb128 0x1
+ 1676 0821 51       		.byte	0x51
+ 1677 0822 03       		.uleb128 0x3
+ 1678 0823 F3       		.byte	0xf3
+ 1679 0824 01       		.uleb128 0x1
+ 1680 0825 51       		.byte	0x51
+ 1681 0826 00       		.byte	0
+ 1682 0827 00       		.byte	0
+ 1683 0828 19       		.uleb128 0x19
+ 1684 0829 B4050000 		.4byte	.LASF73
+ 1685 082d B4050000 		.4byte	.LASF73
+ 1686 0831 07       		.byte	0x7
+ 1687 0832 82       		.byte	0x82
+ 1688 0833 1A       		.uleb128 0x1a
+ 1689 0834 6D000000 		.4byte	.LASF74
+ 1690 0838 6D000000 		.4byte	.LASF74
+ 1691 083c 05       		.byte	0x5
+ 1692 083d 5901     		.2byte	0x159
+ 1693 083f 1A       		.uleb128 0x1a
+ 1694 0840 34000000 		.4byte	.LASF75
+ 1695 0844 34000000 		.4byte	.LASF75
+ 1696 0848 08       		.byte	0x8
+ 1697 0849 7F08     		.2byte	0x87f
+ 1698 084b 1A       		.uleb128 0x1a
+ 1699 084c D7050000 		.4byte	.LASF76
+ 1700 0850 D7050000 		.4byte	.LASF76
+ 1701 0854 08       		.byte	0x8
+ 1702 0855 FA04     		.2byte	0x4fa
+ 1703 0857 1A       		.uleb128 0x1a
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 45
+
+
+ 1704 0858 BF030000 		.4byte	.LASF77
+ 1705 085c BF030000 		.4byte	.LASF77
+ 1706 0860 08       		.byte	0x8
+ 1707 0861 3005     		.2byte	0x530
+ 1708 0863 19       		.uleb128 0x19
+ 1709 0864 15040000 		.4byte	.LASF78
+ 1710 0868 15040000 		.4byte	.LASF78
+ 1711 086c 04       		.byte	0x4
+ 1712 086d 51       		.byte	0x51
+ 1713 086e 1A       		.uleb128 0x1a
+ 1714 086f CD040000 		.4byte	.LASF79
+ 1715 0873 CD040000 		.4byte	.LASF79
+ 1716 0877 08       		.byte	0x8
+ 1717 0878 B708     		.2byte	0x8b7
+ 1718 087a 19       		.uleb128 0x19
+ 1719 087b E1030000 		.4byte	.LASF80
+ 1720 087f E1030000 		.4byte	.LASF80
+ 1721 0883 04       		.byte	0x4
+ 1722 0884 5B       		.byte	0x5b
+ 1723 0885 19       		.uleb128 0x19
+ 1724 0886 3F040000 		.4byte	.LASF81
+ 1725 088a 3F040000 		.4byte	.LASF81
+ 1726 088e 04       		.byte	0x4
+ 1727 088f 5C       		.byte	0x5c
+ 1728 0890 19       		.uleb128 0x19
+ 1729 0891 7D000000 		.4byte	.LASF82
+ 1730 0895 7D000000 		.4byte	.LASF82
+ 1731 0899 04       		.byte	0x4
+ 1732 089a 5D       		.byte	0x5d
+ 1733 089b 19       		.uleb128 0x19
+ 1734 089c A1010000 		.4byte	.LASF83
+ 1735 08a0 A1010000 		.4byte	.LASF83
+ 1736 08a4 04       		.byte	0x4
+ 1737 08a5 5E       		.byte	0x5e
+ 1738 08a6 1A       		.uleb128 0x1a
+ 1739 08a7 00000000 		.4byte	.LASF84
+ 1740 08ab 00000000 		.4byte	.LASF84
+ 1741 08af 08       		.byte	0x8
+ 1742 08b0 A708     		.2byte	0x8a7
+ 1743 08b2 19       		.uleb128 0x19
+ 1744 08b3 B3040000 		.4byte	.LASF85
+ 1745 08b7 B3040000 		.4byte	.LASF85
+ 1746 08bb 07       		.byte	0x7
+ 1747 08bc 83       		.byte	0x83
+ 1748 08bd 00       		.byte	0
+ 1749              		.section	.debug_abbrev,"",%progbits
+ 1750              	.Ldebug_abbrev0:
+ 1751 0000 01       		.uleb128 0x1
+ 1752 0001 11       		.uleb128 0x11
+ 1753 0002 01       		.byte	0x1
+ 1754 0003 25       		.uleb128 0x25
+ 1755 0004 0E       		.uleb128 0xe
+ 1756 0005 13       		.uleb128 0x13
+ 1757 0006 0B       		.uleb128 0xb
+ 1758 0007 03       		.uleb128 0x3
+ 1759 0008 0E       		.uleb128 0xe
+ 1760 0009 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 46
+
+
+ 1761 000a 0E       		.uleb128 0xe
+ 1762 000b 55       		.uleb128 0x55
+ 1763 000c 17       		.uleb128 0x17
+ 1764 000d 11       		.uleb128 0x11
+ 1765 000e 01       		.uleb128 0x1
+ 1766 000f 10       		.uleb128 0x10
+ 1767 0010 17       		.uleb128 0x17
+ 1768 0011 00       		.byte	0
+ 1769 0012 00       		.byte	0
+ 1770 0013 02       		.uleb128 0x2
+ 1771 0014 24       		.uleb128 0x24
+ 1772 0015 00       		.byte	0
+ 1773 0016 0B       		.uleb128 0xb
+ 1774 0017 0B       		.uleb128 0xb
+ 1775 0018 3E       		.uleb128 0x3e
+ 1776 0019 0B       		.uleb128 0xb
+ 1777 001a 03       		.uleb128 0x3
+ 1778 001b 0E       		.uleb128 0xe
+ 1779 001c 00       		.byte	0
+ 1780 001d 00       		.byte	0
+ 1781 001e 03       		.uleb128 0x3
+ 1782 001f 24       		.uleb128 0x24
+ 1783 0020 00       		.byte	0
+ 1784 0021 0B       		.uleb128 0xb
+ 1785 0022 0B       		.uleb128 0xb
+ 1786 0023 3E       		.uleb128 0x3e
+ 1787 0024 0B       		.uleb128 0xb
+ 1788 0025 03       		.uleb128 0x3
+ 1789 0026 08       		.uleb128 0x8
+ 1790 0027 00       		.byte	0
+ 1791 0028 00       		.byte	0
+ 1792 0029 04       		.uleb128 0x4
+ 1793 002a 16       		.uleb128 0x16
+ 1794 002b 00       		.byte	0
+ 1795 002c 03       		.uleb128 0x3
+ 1796 002d 0E       		.uleb128 0xe
+ 1797 002e 3A       		.uleb128 0x3a
+ 1798 002f 0B       		.uleb128 0xb
+ 1799 0030 3B       		.uleb128 0x3b
+ 1800 0031 0B       		.uleb128 0xb
+ 1801 0032 49       		.uleb128 0x49
+ 1802 0033 13       		.uleb128 0x13
+ 1803 0034 00       		.byte	0
+ 1804 0035 00       		.byte	0
+ 1805 0036 05       		.uleb128 0x5
+ 1806 0037 0F       		.uleb128 0xf
+ 1807 0038 00       		.byte	0
+ 1808 0039 0B       		.uleb128 0xb
+ 1809 003a 0B       		.uleb128 0xb
+ 1810 003b 00       		.byte	0
+ 1811 003c 00       		.byte	0
+ 1812 003d 06       		.uleb128 0x6
+ 1813 003e 13       		.uleb128 0x13
+ 1814 003f 01       		.byte	0x1
+ 1815 0040 03       		.uleb128 0x3
+ 1816 0041 0E       		.uleb128 0xe
+ 1817 0042 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 47
+
+
+ 1818 0043 0B       		.uleb128 0xb
+ 1819 0044 3A       		.uleb128 0x3a
+ 1820 0045 0B       		.uleb128 0xb
+ 1821 0046 3B       		.uleb128 0x3b
+ 1822 0047 0B       		.uleb128 0xb
+ 1823 0048 01       		.uleb128 0x1
+ 1824 0049 13       		.uleb128 0x13
+ 1825 004a 00       		.byte	0
+ 1826 004b 00       		.byte	0
+ 1827 004c 07       		.uleb128 0x7
+ 1828 004d 0D       		.uleb128 0xd
+ 1829 004e 00       		.byte	0
+ 1830 004f 03       		.uleb128 0x3
+ 1831 0050 0E       		.uleb128 0xe
+ 1832 0051 3A       		.uleb128 0x3a
+ 1833 0052 0B       		.uleb128 0xb
+ 1834 0053 3B       		.uleb128 0x3b
+ 1835 0054 0B       		.uleb128 0xb
+ 1836 0055 49       		.uleb128 0x49
+ 1837 0056 13       		.uleb128 0x13
+ 1838 0057 38       		.uleb128 0x38
+ 1839 0058 0B       		.uleb128 0xb
+ 1840 0059 00       		.byte	0
+ 1841 005a 00       		.byte	0
+ 1842 005b 08       		.uleb128 0x8
+ 1843 005c 0F       		.uleb128 0xf
+ 1844 005d 00       		.byte	0
+ 1845 005e 0B       		.uleb128 0xb
+ 1846 005f 0B       		.uleb128 0xb
+ 1847 0060 49       		.uleb128 0x49
+ 1848 0061 13       		.uleb128 0x13
+ 1849 0062 00       		.byte	0
+ 1850 0063 00       		.byte	0
+ 1851 0064 09       		.uleb128 0x9
+ 1852 0065 35       		.uleb128 0x35
+ 1853 0066 00       		.byte	0
+ 1854 0067 49       		.uleb128 0x49
+ 1855 0068 13       		.uleb128 0x13
+ 1856 0069 00       		.byte	0
+ 1857 006a 00       		.byte	0
+ 1858 006b 0A       		.uleb128 0xa
+ 1859 006c 2E       		.uleb128 0x2e
+ 1860 006d 01       		.byte	0x1
+ 1861 006e 03       		.uleb128 0x3
+ 1862 006f 0E       		.uleb128 0xe
+ 1863 0070 3A       		.uleb128 0x3a
+ 1864 0071 0B       		.uleb128 0xb
+ 1865 0072 3B       		.uleb128 0x3b
+ 1866 0073 05       		.uleb128 0x5
+ 1867 0074 27       		.uleb128 0x27
+ 1868 0075 19       		.uleb128 0x19
+ 1869 0076 49       		.uleb128 0x49
+ 1870 0077 13       		.uleb128 0x13
+ 1871 0078 11       		.uleb128 0x11
+ 1872 0079 01       		.uleb128 0x1
+ 1873 007a 12       		.uleb128 0x12
+ 1874 007b 06       		.uleb128 0x6
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 48
+
+
+ 1875 007c 40       		.uleb128 0x40
+ 1876 007d 18       		.uleb128 0x18
+ 1877 007e 9742     		.uleb128 0x2117
+ 1878 0080 19       		.uleb128 0x19
+ 1879 0081 01       		.uleb128 0x1
+ 1880 0082 13       		.uleb128 0x13
+ 1881 0083 00       		.byte	0
+ 1882 0084 00       		.byte	0
+ 1883 0085 0B       		.uleb128 0xb
+ 1884 0086 05       		.uleb128 0x5
+ 1885 0087 00       		.byte	0
+ 1886 0088 03       		.uleb128 0x3
+ 1887 0089 0E       		.uleb128 0xe
+ 1888 008a 3A       		.uleb128 0x3a
+ 1889 008b 0B       		.uleb128 0xb
+ 1890 008c 3B       		.uleb128 0x3b
+ 1891 008d 05       		.uleb128 0x5
+ 1892 008e 49       		.uleb128 0x49
+ 1893 008f 13       		.uleb128 0x13
+ 1894 0090 02       		.uleb128 0x2
+ 1895 0091 17       		.uleb128 0x17
+ 1896 0092 00       		.byte	0
+ 1897 0093 00       		.byte	0
+ 1898 0094 0C       		.uleb128 0xc
+ 1899 0095 05       		.uleb128 0x5
+ 1900 0096 00       		.byte	0
+ 1901 0097 03       		.uleb128 0x3
+ 1902 0098 0E       		.uleb128 0xe
+ 1903 0099 3A       		.uleb128 0x3a
+ 1904 009a 0B       		.uleb128 0xb
+ 1905 009b 3B       		.uleb128 0x3b
+ 1906 009c 05       		.uleb128 0x5
+ 1907 009d 49       		.uleb128 0x49
+ 1908 009e 13       		.uleb128 0x13
+ 1909 009f 02       		.uleb128 0x2
+ 1910 00a0 18       		.uleb128 0x18
+ 1911 00a1 00       		.byte	0
+ 1912 00a2 00       		.byte	0
+ 1913 00a3 0D       		.uleb128 0xd
+ 1914 00a4 34       		.uleb128 0x34
+ 1915 00a5 00       		.byte	0
+ 1916 00a6 03       		.uleb128 0x3
+ 1917 00a7 0E       		.uleb128 0xe
+ 1918 00a8 3A       		.uleb128 0x3a
+ 1919 00a9 0B       		.uleb128 0xb
+ 1920 00aa 3B       		.uleb128 0x3b
+ 1921 00ab 05       		.uleb128 0x5
+ 1922 00ac 49       		.uleb128 0x49
+ 1923 00ad 13       		.uleb128 0x13
+ 1924 00ae 02       		.uleb128 0x2
+ 1925 00af 17       		.uleb128 0x17
+ 1926 00b0 00       		.byte	0
+ 1927 00b1 00       		.byte	0
+ 1928 00b2 0E       		.uleb128 0xe
+ 1929 00b3 26       		.uleb128 0x26
+ 1930 00b4 00       		.byte	0
+ 1931 00b5 49       		.uleb128 0x49
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 49
+
+
+ 1932 00b6 13       		.uleb128 0x13
+ 1933 00b7 00       		.byte	0
+ 1934 00b8 00       		.byte	0
+ 1935 00b9 0F       		.uleb128 0xf
+ 1936 00ba 2E       		.uleb128 0x2e
+ 1937 00bb 01       		.byte	0x1
+ 1938 00bc 3F       		.uleb128 0x3f
+ 1939 00bd 19       		.uleb128 0x19
+ 1940 00be 03       		.uleb128 0x3
+ 1941 00bf 0E       		.uleb128 0xe
+ 1942 00c0 3A       		.uleb128 0x3a
+ 1943 00c1 0B       		.uleb128 0xb
+ 1944 00c2 3B       		.uleb128 0x3b
+ 1945 00c3 0B       		.uleb128 0xb
+ 1946 00c4 27       		.uleb128 0x27
+ 1947 00c5 19       		.uleb128 0x19
+ 1948 00c6 49       		.uleb128 0x49
+ 1949 00c7 13       		.uleb128 0x13
+ 1950 00c8 11       		.uleb128 0x11
+ 1951 00c9 01       		.uleb128 0x1
+ 1952 00ca 12       		.uleb128 0x12
+ 1953 00cb 06       		.uleb128 0x6
+ 1954 00cc 40       		.uleb128 0x40
+ 1955 00cd 18       		.uleb128 0x18
+ 1956 00ce 9742     		.uleb128 0x2117
+ 1957 00d0 19       		.uleb128 0x19
+ 1958 00d1 01       		.uleb128 0x1
+ 1959 00d2 13       		.uleb128 0x13
+ 1960 00d3 00       		.byte	0
+ 1961 00d4 00       		.byte	0
+ 1962 00d5 10       		.uleb128 0x10
+ 1963 00d6 34       		.uleb128 0x34
+ 1964 00d7 00       		.byte	0
+ 1965 00d8 03       		.uleb128 0x3
+ 1966 00d9 0E       		.uleb128 0xe
+ 1967 00da 3A       		.uleb128 0x3a
+ 1968 00db 0B       		.uleb128 0xb
+ 1969 00dc 3B       		.uleb128 0x3b
+ 1970 00dd 0B       		.uleb128 0xb
+ 1971 00de 49       		.uleb128 0x49
+ 1972 00df 13       		.uleb128 0x13
+ 1973 00e0 02       		.uleb128 0x2
+ 1974 00e1 17       		.uleb128 0x17
+ 1975 00e2 00       		.byte	0
+ 1976 00e3 00       		.byte	0
+ 1977 00e4 11       		.uleb128 0x11
+ 1978 00e5 898201   		.uleb128 0x4109
+ 1979 00e8 01       		.byte	0x1
+ 1980 00e9 11       		.uleb128 0x11
+ 1981 00ea 01       		.uleb128 0x1
+ 1982 00eb 31       		.uleb128 0x31
+ 1983 00ec 13       		.uleb128 0x13
+ 1984 00ed 01       		.uleb128 0x1
+ 1985 00ee 13       		.uleb128 0x13
+ 1986 00ef 00       		.byte	0
+ 1987 00f0 00       		.byte	0
+ 1988 00f1 12       		.uleb128 0x12
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 50
+
+
+ 1989 00f2 8A8201   		.uleb128 0x410a
+ 1990 00f5 00       		.byte	0
+ 1991 00f6 02       		.uleb128 0x2
+ 1992 00f7 18       		.uleb128 0x18
+ 1993 00f8 9142     		.uleb128 0x2111
+ 1994 00fa 18       		.uleb128 0x18
+ 1995 00fb 00       		.byte	0
+ 1996 00fc 00       		.byte	0
+ 1997 00fd 13       		.uleb128 0x13
+ 1998 00fe 898201   		.uleb128 0x4109
+ 1999 0101 01       		.byte	0x1
+ 2000 0102 11       		.uleb128 0x11
+ 2001 0103 01       		.uleb128 0x1
+ 2002 0104 31       		.uleb128 0x31
+ 2003 0105 13       		.uleb128 0x13
+ 2004 0106 00       		.byte	0
+ 2005 0107 00       		.byte	0
+ 2006 0108 14       		.uleb128 0x14
+ 2007 0109 2E       		.uleb128 0x2e
+ 2008 010a 01       		.byte	0x1
+ 2009 010b 3F       		.uleb128 0x3f
+ 2010 010c 19       		.uleb128 0x19
+ 2011 010d 03       		.uleb128 0x3
+ 2012 010e 0E       		.uleb128 0xe
+ 2013 010f 3A       		.uleb128 0x3a
+ 2014 0110 0B       		.uleb128 0xb
+ 2015 0111 3B       		.uleb128 0x3b
+ 2016 0112 05       		.uleb128 0x5
+ 2017 0113 27       		.uleb128 0x27
+ 2018 0114 19       		.uleb128 0x19
+ 2019 0115 49       		.uleb128 0x49
+ 2020 0116 13       		.uleb128 0x13
+ 2021 0117 11       		.uleb128 0x11
+ 2022 0118 01       		.uleb128 0x1
+ 2023 0119 12       		.uleb128 0x12
+ 2024 011a 06       		.uleb128 0x6
+ 2025 011b 40       		.uleb128 0x40
+ 2026 011c 18       		.uleb128 0x18
+ 2027 011d 9742     		.uleb128 0x2117
+ 2028 011f 19       		.uleb128 0x19
+ 2029 0120 01       		.uleb128 0x1
+ 2030 0121 13       		.uleb128 0x13
+ 2031 0122 00       		.byte	0
+ 2032 0123 00       		.byte	0
+ 2033 0124 15       		.uleb128 0x15
+ 2034 0125 0B       		.uleb128 0xb
+ 2035 0126 01       		.byte	0x1
+ 2036 0127 55       		.uleb128 0x55
+ 2037 0128 17       		.uleb128 0x17
+ 2038 0129 01       		.uleb128 0x1
+ 2039 012a 13       		.uleb128 0x13
+ 2040 012b 00       		.byte	0
+ 2041 012c 00       		.byte	0
+ 2042 012d 16       		.uleb128 0x16
+ 2043 012e 898201   		.uleb128 0x4109
+ 2044 0131 00       		.byte	0
+ 2045 0132 11       		.uleb128 0x11
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 51
+
+
+ 2046 0133 01       		.uleb128 0x1
+ 2047 0134 31       		.uleb128 0x31
+ 2048 0135 13       		.uleb128 0x13
+ 2049 0136 00       		.byte	0
+ 2050 0137 00       		.byte	0
+ 2051 0138 17       		.uleb128 0x17
+ 2052 0139 05       		.uleb128 0x5
+ 2053 013a 00       		.byte	0
+ 2054 013b 03       		.uleb128 0x3
+ 2055 013c 0E       		.uleb128 0xe
+ 2056 013d 3A       		.uleb128 0x3a
+ 2057 013e 0B       		.uleb128 0xb
+ 2058 013f 3B       		.uleb128 0x3b
+ 2059 0140 0B       		.uleb128 0xb
+ 2060 0141 49       		.uleb128 0x49
+ 2061 0142 13       		.uleb128 0x13
+ 2062 0143 02       		.uleb128 0x2
+ 2063 0144 17       		.uleb128 0x17
+ 2064 0145 00       		.byte	0
+ 2065 0146 00       		.byte	0
+ 2066 0147 18       		.uleb128 0x18
+ 2067 0148 2E       		.uleb128 0x2e
+ 2068 0149 01       		.byte	0x1
+ 2069 014a 3F       		.uleb128 0x3f
+ 2070 014b 19       		.uleb128 0x19
+ 2071 014c 03       		.uleb128 0x3
+ 2072 014d 0E       		.uleb128 0xe
+ 2073 014e 3A       		.uleb128 0x3a
+ 2074 014f 0B       		.uleb128 0xb
+ 2075 0150 3B       		.uleb128 0x3b
+ 2076 0151 05       		.uleb128 0x5
+ 2077 0152 27       		.uleb128 0x27
+ 2078 0153 19       		.uleb128 0x19
+ 2079 0154 11       		.uleb128 0x11
+ 2080 0155 01       		.uleb128 0x1
+ 2081 0156 12       		.uleb128 0x12
+ 2082 0157 06       		.uleb128 0x6
+ 2083 0158 40       		.uleb128 0x40
+ 2084 0159 18       		.uleb128 0x18
+ 2085 015a 9742     		.uleb128 0x2117
+ 2086 015c 19       		.uleb128 0x19
+ 2087 015d 01       		.uleb128 0x1
+ 2088 015e 13       		.uleb128 0x13
+ 2089 015f 00       		.byte	0
+ 2090 0160 00       		.byte	0
+ 2091 0161 19       		.uleb128 0x19
+ 2092 0162 2E       		.uleb128 0x2e
+ 2093 0163 00       		.byte	0
+ 2094 0164 3F       		.uleb128 0x3f
+ 2095 0165 19       		.uleb128 0x19
+ 2096 0166 3C       		.uleb128 0x3c
+ 2097 0167 19       		.uleb128 0x19
+ 2098 0168 6E       		.uleb128 0x6e
+ 2099 0169 0E       		.uleb128 0xe
+ 2100 016a 03       		.uleb128 0x3
+ 2101 016b 0E       		.uleb128 0xe
+ 2102 016c 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 52
+
+
+ 2103 016d 0B       		.uleb128 0xb
+ 2104 016e 3B       		.uleb128 0x3b
+ 2105 016f 0B       		.uleb128 0xb
+ 2106 0170 00       		.byte	0
+ 2107 0171 00       		.byte	0
+ 2108 0172 1A       		.uleb128 0x1a
+ 2109 0173 2E       		.uleb128 0x2e
+ 2110 0174 00       		.byte	0
+ 2111 0175 3F       		.uleb128 0x3f
+ 2112 0176 19       		.uleb128 0x19
+ 2113 0177 3C       		.uleb128 0x3c
+ 2114 0178 19       		.uleb128 0x19
+ 2115 0179 6E       		.uleb128 0x6e
+ 2116 017a 0E       		.uleb128 0xe
+ 2117 017b 03       		.uleb128 0x3
+ 2118 017c 0E       		.uleb128 0xe
+ 2119 017d 3A       		.uleb128 0x3a
+ 2120 017e 0B       		.uleb128 0xb
+ 2121 017f 3B       		.uleb128 0x3b
+ 2122 0180 05       		.uleb128 0x5
+ 2123 0181 00       		.byte	0
+ 2124 0182 00       		.byte	0
+ 2125 0183 00       		.byte	0
+ 2126              		.section	.debug_loc,"",%progbits
+ 2127              	.Ldebug_loc0:
+ 2128              	.LLST0:
+ 2129 0000 00000000 		.4byte	.LVL0
+ 2130 0004 0A000000 		.4byte	.LVL1
+ 2131 0008 0100     		.2byte	0x1
+ 2132 000a 50       		.byte	0x50
+ 2133 000b 0A000000 		.4byte	.LVL1
+ 2134 000f 0C000000 		.4byte	.LVL2
+ 2135 0013 0400     		.2byte	0x4
+ 2136 0015 F3       		.byte	0xf3
+ 2137 0016 01       		.uleb128 0x1
+ 2138 0017 50       		.byte	0x50
+ 2139 0018 9F       		.byte	0x9f
+ 2140 0019 0C000000 		.4byte	.LVL2
+ 2141 001d 0E000000 		.4byte	.LVL3
+ 2142 0021 0100     		.2byte	0x1
+ 2143 0023 50       		.byte	0x50
+ 2144 0024 0E000000 		.4byte	.LVL3
+ 2145 0028 16000000 		.4byte	.LVL4
+ 2146 002c 0400     		.2byte	0x4
+ 2147 002e F3       		.byte	0xf3
+ 2148 002f 01       		.uleb128 0x1
+ 2149 0030 50       		.byte	0x50
+ 2150 0031 9F       		.byte	0x9f
+ 2151 0032 16000000 		.4byte	.LVL4
+ 2152 0036 18000000 		.4byte	.LVL5
+ 2153 003a 0100     		.2byte	0x1
+ 2154 003c 50       		.byte	0x50
+ 2155 003d 18000000 		.4byte	.LVL5
+ 2156 0041 1E000000 		.4byte	.LFE41
+ 2157 0045 0400     		.2byte	0x4
+ 2158 0047 F3       		.byte	0xf3
+ 2159 0048 01       		.uleb128 0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 53
+
+
+ 2160 0049 50       		.byte	0x50
+ 2161 004a 9F       		.byte	0x9f
+ 2162 004b 00000000 		.4byte	0
+ 2163 004f 00000000 		.4byte	0
+ 2164              	.LLST1:
+ 2165 0053 00000000 		.4byte	.LVL0
+ 2166 0057 1C000000 		.4byte	.LVL6
+ 2167 005b 0200     		.2byte	0x2
+ 2168 005d 30       		.byte	0x30
+ 2169 005e 9F       		.byte	0x9f
+ 2170 005f 1C000000 		.4byte	.LVL6
+ 2171 0063 1E000000 		.4byte	.LFE41
+ 2172 0067 0100     		.2byte	0x1
+ 2173 0069 50       		.byte	0x50
+ 2174 006a 00000000 		.4byte	0
+ 2175 006e 00000000 		.4byte	0
+ 2176              	.LLST2:
+ 2177 0072 0A000000 		.4byte	.LVL8
+ 2178 0076 10000000 		.4byte	.LVL9
+ 2179 007a 0100     		.2byte	0x1
+ 2180 007c 50       		.byte	0x50
+ 2181 007d 10000000 		.4byte	.LVL9
+ 2182 0081 16000000 		.4byte	.LVL11
+ 2183 0085 0100     		.2byte	0x1
+ 2184 0087 54       		.byte	0x54
+ 2185 0088 16000000 		.4byte	.LVL11
+ 2186 008c 18000000 		.4byte	.LFE32
+ 2187 0090 0100     		.2byte	0x1
+ 2188 0092 50       		.byte	0x50
+ 2189 0093 00000000 		.4byte	0
+ 2190 0097 00000000 		.4byte	0
+ 2191              	.LLST3:
+ 2192 009b 00000000 		.4byte	.LVL12
+ 2193 009f 0F000000 		.4byte	.LVL14-1
+ 2194 00a3 0100     		.2byte	0x1
+ 2195 00a5 50       		.byte	0x50
+ 2196 00a6 0F000000 		.4byte	.LVL14-1
+ 2197 00aa A6000000 		.4byte	.LVL41
+ 2198 00ae 0100     		.2byte	0x1
+ 2199 00b0 57       		.byte	0x57
+ 2200 00b1 A6000000 		.4byte	.LVL41
+ 2201 00b5 A8000000 		.4byte	.LFE34
+ 2202 00b9 0400     		.2byte	0x4
+ 2203 00bb F3       		.byte	0xf3
+ 2204 00bc 01       		.uleb128 0x1
+ 2205 00bd 50       		.byte	0x50
+ 2206 00be 9F       		.byte	0x9f
+ 2207 00bf 00000000 		.4byte	0
+ 2208 00c3 00000000 		.4byte	0
+ 2209              	.LLST4:
+ 2210 00c7 00000000 		.4byte	.LVL12
+ 2211 00cb 0F000000 		.4byte	.LVL14-1
+ 2212 00cf 0100     		.2byte	0x1
+ 2213 00d1 51       		.byte	0x51
+ 2214 00d2 0F000000 		.4byte	.LVL14-1
+ 2215 00d6 A6000000 		.4byte	.LVL39
+ 2216 00da 0100     		.2byte	0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 54
+
+
+ 2217 00dc 55       		.byte	0x55
+ 2218 00dd A6000000 		.4byte	.LVL39
+ 2219 00e1 A8000000 		.4byte	.LFE34
+ 2220 00e5 0400     		.2byte	0x4
+ 2221 00e7 F3       		.byte	0xf3
+ 2222 00e8 01       		.uleb128 0x1
+ 2223 00e9 51       		.byte	0x51
+ 2224 00ea 9F       		.byte	0x9f
+ 2225 00eb 00000000 		.4byte	0
+ 2226 00ef 00000000 		.4byte	0
+ 2227              	.LLST5:
+ 2228 00f3 00000000 		.4byte	.LVL12
+ 2229 00f7 0F000000 		.4byte	.LVL14-1
+ 2230 00fb 0100     		.2byte	0x1
+ 2231 00fd 52       		.byte	0x52
+ 2232 00fe 0F000000 		.4byte	.LVL14-1
+ 2233 0102 A6000000 		.4byte	.LVL40
+ 2234 0106 0100     		.2byte	0x1
+ 2235 0108 56       		.byte	0x56
+ 2236 0109 A6000000 		.4byte	.LVL40
+ 2237 010d A8000000 		.4byte	.LFE34
+ 2238 0111 0400     		.2byte	0x4
+ 2239 0113 F3       		.byte	0xf3
+ 2240 0114 01       		.uleb128 0x1
+ 2241 0115 52       		.byte	0x52
+ 2242 0116 9F       		.byte	0x9f
+ 2243 0117 00000000 		.4byte	0
+ 2244 011b 00000000 		.4byte	0
+ 2245              	.LLST6:
+ 2246 011f 00000000 		.4byte	.LVL12
+ 2247 0123 0F000000 		.4byte	.LVL14-1
+ 2248 0127 0100     		.2byte	0x1
+ 2249 0129 53       		.byte	0x53
+ 2250 012a 0F000000 		.4byte	.LVL14-1
+ 2251 012e A8000000 		.4byte	.LFE34
+ 2252 0132 0200     		.2byte	0x2
+ 2253 0134 91       		.byte	0x91
+ 2254 0135 64       		.sleb128 -28
+ 2255 0136 00000000 		.4byte	0
+ 2256 013a 00000000 		.4byte	0
+ 2257              	.LLST7:
+ 2258 013e 00000000 		.4byte	.LVL12
+ 2259 0142 20000000 		.4byte	.LVL17
+ 2260 0146 0200     		.2byte	0x2
+ 2261 0148 91       		.byte	0x91
+ 2262 0149 00       		.sleb128 0
+ 2263 014a 20000000 		.4byte	.LVL17
+ 2264 014e 30000000 		.4byte	.LVL18
+ 2265 0152 0200     		.2byte	0x2
+ 2266 0154 30       		.byte	0x30
+ 2267 0155 9F       		.byte	0x9f
+ 2268 0156 30000000 		.4byte	.LVL18
+ 2269 015a 5C000000 		.4byte	.LVL25
+ 2270 015e 0200     		.2byte	0x2
+ 2271 0160 91       		.byte	0x91
+ 2272 0161 00       		.sleb128 0
+ 2273 0162 5C000000 		.4byte	.LVL25
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 55
+
+
+ 2274 0166 60000000 		.4byte	.LVL26
+ 2275 016a 0200     		.2byte	0x2
+ 2276 016c 30       		.byte	0x30
+ 2277 016d 9F       		.byte	0x9f
+ 2278 016e 60000000 		.4byte	.LVL26
+ 2279 0172 A8000000 		.4byte	.LFE34
+ 2280 0176 0200     		.2byte	0x2
+ 2281 0178 91       		.byte	0x91
+ 2282 0179 00       		.sleb128 0
+ 2283 017a 00000000 		.4byte	0
+ 2284 017e 00000000 		.4byte	0
+ 2285              	.LLST8:
+ 2286 0182 0C000000 		.4byte	.LVL13
+ 2287 0186 0F000000 		.4byte	.LVL14-1
+ 2288 018a 0100     		.2byte	0x1
+ 2289 018c 50       		.byte	0x50
+ 2290 018d 0F000000 		.4byte	.LVL14-1
+ 2291 0191 A6000000 		.4byte	.LVL41
+ 2292 0195 0100     		.2byte	0x1
+ 2293 0197 57       		.byte	0x57
+ 2294 0198 A6000000 		.4byte	.LVL41
+ 2295 019c A8000000 		.4byte	.LFE34
+ 2296 01a0 0400     		.2byte	0x4
+ 2297 01a2 F3       		.byte	0xf3
+ 2298 01a3 01       		.uleb128 0x1
+ 2299 01a4 50       		.byte	0x50
+ 2300 01a5 9F       		.byte	0x9f
+ 2301 01a6 00000000 		.4byte	0
+ 2302 01aa 00000000 		.4byte	0
+ 2303              	.LLST9:
+ 2304 01ae 20000000 		.4byte	.LVL17
+ 2305 01b2 30000000 		.4byte	.LVL18
+ 2306 01b6 0100     		.2byte	0x1
+ 2307 01b8 54       		.byte	0x54
+ 2308 01b9 58000000 		.4byte	.LVL23
+ 2309 01bd 5C000000 		.4byte	.LVL25
+ 2310 01c1 0200     		.2byte	0x2
+ 2311 01c3 30       		.byte	0x30
+ 2312 01c4 9F       		.byte	0x9f
+ 2313 01c5 5C000000 		.4byte	.LVL25
+ 2314 01c9 78000000 		.4byte	.LVL30
+ 2315 01cd 0100     		.2byte	0x1
+ 2316 01cf 54       		.byte	0x54
+ 2317 01d0 78000000 		.4byte	.LVL30
+ 2318 01d4 7F000000 		.4byte	.LVL31-1
+ 2319 01d8 0100     		.2byte	0x1
+ 2320 01da 50       		.byte	0x50
+ 2321 01db 7F000000 		.4byte	.LVL31-1
+ 2322 01df A0000000 		.4byte	.LVL36
+ 2323 01e3 0100     		.2byte	0x1
+ 2324 01e5 54       		.byte	0x54
+ 2325 01e6 A2000000 		.4byte	.LVL37
+ 2326 01ea A6000000 		.4byte	.LVL38
+ 2327 01ee 0100     		.2byte	0x1
+ 2328 01f0 54       		.byte	0x54
+ 2329 01f1 A6000000 		.4byte	.LVL38
+ 2330 01f5 A8000000 		.4byte	.LFE34
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 56
+
+
+ 2331 01f9 0100     		.2byte	0x1
+ 2332 01fb 50       		.byte	0x50
+ 2333 01fc 00000000 		.4byte	0
+ 2334 0200 00000000 		.4byte	0
+ 2335              	.LLST10:
+ 2336 0204 0C000000 		.4byte	.LVL13
+ 2337 0208 42000000 		.4byte	.LVL19
+ 2338 020c 0200     		.2byte	0x2
+ 2339 020e 30       		.byte	0x30
+ 2340 020f 9F       		.byte	0x9f
+ 2341 0210 42000000 		.4byte	.LVL19
+ 2342 0214 50000000 		.4byte	.LVL21
+ 2343 0218 0100     		.2byte	0x1
+ 2344 021a 51       		.byte	0x51
+ 2345 021b 5C000000 		.4byte	.LVL25
+ 2346 021f 60000000 		.4byte	.LVL26
+ 2347 0223 0200     		.2byte	0x2
+ 2348 0225 30       		.byte	0x30
+ 2349 0226 9F       		.byte	0x9f
+ 2350 0227 00000000 		.4byte	0
+ 2351 022b 00000000 		.4byte	0
+ 2352              	.LLST11:
+ 2353 022f 1C000000 		.4byte	.LVL16
+ 2354 0233 52000000 		.4byte	.LVL22
+ 2355 0237 0100     		.2byte	0x1
+ 2356 0239 50       		.byte	0x50
+ 2357 023a 5C000000 		.4byte	.LVL25
+ 2358 023e 60000000 		.4byte	.LVL26
+ 2359 0242 0100     		.2byte	0x1
+ 2360 0244 50       		.byte	0x50
+ 2361 0245 00000000 		.4byte	0
+ 2362 0249 00000000 		.4byte	0
+ 2363              	.LLST12:
+ 2364 024d 64000000 		.4byte	.LVL27
+ 2365 0251 71000000 		.4byte	.LVL28-1
+ 2366 0255 0100     		.2byte	0x1
+ 2367 0257 50       		.byte	0x50
+ 2368 0258 00000000 		.4byte	0
+ 2369 025c 00000000 		.4byte	0
+ 2370              	.LLST13:
+ 2371 0260 0C000000 		.4byte	.LVL13
+ 2372 0264 9A000000 		.4byte	.LVL34
+ 2373 0268 0200     		.2byte	0x2
+ 2374 026a 30       		.byte	0x30
+ 2375 026b 9F       		.byte	0x9f
+ 2376 026c 9A000000 		.4byte	.LVL34
+ 2377 0270 9E000000 		.4byte	.LVL35
+ 2378 0274 0200     		.2byte	0x2
+ 2379 0276 31       		.byte	0x31
+ 2380 0277 9F       		.byte	0x9f
+ 2381 0278 00000000 		.4byte	0
+ 2382 027c 00000000 		.4byte	0
+ 2383              	.LLST14:
+ 2384 0280 12000000 		.4byte	.LVL15
+ 2385 0284 5A000000 		.4byte	.LVL24
+ 2386 0288 0100     		.2byte	0x1
+ 2387 028a 54       		.byte	0x54
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 57
+
+
+ 2388 028b 5C000000 		.4byte	.LVL25
+ 2389 028f 60000000 		.4byte	.LVL26
+ 2390 0293 0100     		.2byte	0x1
+ 2391 0295 54       		.byte	0x54
+ 2392 0296 00000000 		.4byte	0
+ 2393 029a 00000000 		.4byte	0
+ 2394              	.LLST15:
+ 2395 029e 00000000 		.4byte	.LVL42
+ 2396 02a2 09000000 		.4byte	.LVL44-1
+ 2397 02a6 0100     		.2byte	0x1
+ 2398 02a8 50       		.byte	0x50
+ 2399 02a9 09000000 		.4byte	.LVL44-1
+ 2400 02ad 18000000 		.4byte	.LVL48
+ 2401 02b1 0100     		.2byte	0x1
+ 2402 02b3 55       		.byte	0x55
+ 2403 02b4 18000000 		.4byte	.LVL48
+ 2404 02b8 1A000000 		.4byte	.LFE35
+ 2405 02bc 0400     		.2byte	0x4
+ 2406 02be F3       		.byte	0xf3
+ 2407 02bf 01       		.uleb128 0x1
+ 2408 02c0 50       		.byte	0x50
+ 2409 02c1 9F       		.byte	0x9f
+ 2410 02c2 00000000 		.4byte	0
+ 2411 02c6 00000000 		.4byte	0
+ 2412              	.LLST16:
+ 2413 02ca 00000000 		.4byte	.LVL42
+ 2414 02ce 09000000 		.4byte	.LVL44-1
+ 2415 02d2 0100     		.2byte	0x1
+ 2416 02d4 51       		.byte	0x51
+ 2417 02d5 09000000 		.4byte	.LVL44-1
+ 2418 02d9 18000000 		.4byte	.LVL49
+ 2419 02dd 0100     		.2byte	0x1
+ 2420 02df 56       		.byte	0x56
+ 2421 02e0 18000000 		.4byte	.LVL49
+ 2422 02e4 1A000000 		.4byte	.LFE35
+ 2423 02e8 0400     		.2byte	0x4
+ 2424 02ea F3       		.byte	0xf3
+ 2425 02eb 01       		.uleb128 0x1
+ 2426 02ec 51       		.byte	0x51
+ 2427 02ed 9F       		.byte	0x9f
+ 2428 02ee 00000000 		.4byte	0
+ 2429 02f2 00000000 		.4byte	0
+ 2430              	.LLST17:
+ 2431 02f6 06000000 		.4byte	.LVL43
+ 2432 02fa 09000000 		.4byte	.LVL44-1
+ 2433 02fe 0100     		.2byte	0x1
+ 2434 0300 50       		.byte	0x50
+ 2435 0301 09000000 		.4byte	.LVL44-1
+ 2436 0305 18000000 		.4byte	.LVL48
+ 2437 0309 0100     		.2byte	0x1
+ 2438 030b 55       		.byte	0x55
+ 2439 030c 18000000 		.4byte	.LVL48
+ 2440 0310 1A000000 		.4byte	.LFE35
+ 2441 0314 0400     		.2byte	0x4
+ 2442 0316 F3       		.byte	0xf3
+ 2443 0317 01       		.uleb128 0x1
+ 2444 0318 50       		.byte	0x50
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 58
+
+
+ 2445 0319 9F       		.byte	0x9f
+ 2446 031a 00000000 		.4byte	0
+ 2447 031e 00000000 		.4byte	0
+ 2448              	.LLST18:
+ 2449 0322 0C000000 		.4byte	.LVL45
+ 2450 0326 18000000 		.4byte	.LVL47
+ 2451 032a 0100     		.2byte	0x1
+ 2452 032c 54       		.byte	0x54
+ 2453 032d 18000000 		.4byte	.LVL47
+ 2454 0331 1A000000 		.4byte	.LFE35
+ 2455 0335 0100     		.2byte	0x1
+ 2456 0337 50       		.byte	0x50
+ 2457 0338 00000000 		.4byte	0
+ 2458 033c 00000000 		.4byte	0
+ 2459              	.LLST19:
+ 2460 0340 00000000 		.4byte	.LVL50
+ 2461 0344 07000000 		.4byte	.LVL52-1
+ 2462 0348 0100     		.2byte	0x1
+ 2463 034a 50       		.byte	0x50
+ 2464 034b 07000000 		.4byte	.LVL52-1
+ 2465 034f 0A000000 		.4byte	.LVL53
+ 2466 0353 0100     		.2byte	0x1
+ 2467 0355 54       		.byte	0x54
+ 2468 0356 0A000000 		.4byte	.LVL53
+ 2469 035a 12000000 		.4byte	.LFE36
+ 2470 035e 0400     		.2byte	0x4
+ 2471 0360 F3       		.byte	0xf3
+ 2472 0361 01       		.uleb128 0x1
+ 2473 0362 50       		.byte	0x50
+ 2474 0363 9F       		.byte	0x9f
+ 2475 0364 00000000 		.4byte	0
+ 2476 0368 00000000 		.4byte	0
+ 2477              	.LLST20:
+ 2478 036c 08000000 		.4byte	.LVL52
+ 2479 0370 0D000000 		.4byte	.LVL54-1
+ 2480 0374 0100     		.2byte	0x1
+ 2481 0376 50       		.byte	0x50
+ 2482 0377 00000000 		.4byte	0
+ 2483 037b 00000000 		.4byte	0
+ 2484              	.LLST21:
+ 2485 037f 04000000 		.4byte	.LVL51
+ 2486 0383 07000000 		.4byte	.LVL52-1
+ 2487 0387 0100     		.2byte	0x1
+ 2488 0389 50       		.byte	0x50
+ 2489 038a 07000000 		.4byte	.LVL52-1
+ 2490 038e 0A000000 		.4byte	.LVL53
+ 2491 0392 0100     		.2byte	0x1
+ 2492 0394 54       		.byte	0x54
+ 2493 0395 0A000000 		.4byte	.LVL53
+ 2494 0399 12000000 		.4byte	.LFE36
+ 2495 039d 0400     		.2byte	0x4
+ 2496 039f F3       		.byte	0xf3
+ 2497 03a0 01       		.uleb128 0x1
+ 2498 03a1 50       		.byte	0x50
+ 2499 03a2 9F       		.byte	0x9f
+ 2500 03a3 00000000 		.4byte	0
+ 2501 03a7 00000000 		.4byte	0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 59
+
+
+ 2502              	.LLST22:
+ 2503 03ab 0A000000 		.4byte	.LVL53
+ 2504 03af 10000000 		.4byte	.LVL55
+ 2505 03b3 0100     		.2byte	0x1
+ 2506 03b5 54       		.byte	0x54
+ 2507 03b6 10000000 		.4byte	.LVL55
+ 2508 03ba 12000000 		.4byte	.LFE36
+ 2509 03be 0100     		.2byte	0x1
+ 2510 03c0 50       		.byte	0x50
+ 2511 03c1 00000000 		.4byte	0
+ 2512 03c5 00000000 		.4byte	0
+ 2513              	.LLST23:
+ 2514 03c9 00000000 		.4byte	.LVL56
+ 2515 03cd 0D000000 		.4byte	.LVL59-1
+ 2516 03d1 0100     		.2byte	0x1
+ 2517 03d3 50       		.byte	0x50
+ 2518 03d4 0D000000 		.4byte	.LVL59-1
+ 2519 03d8 6A000000 		.4byte	.LVL74
+ 2520 03dc 0100     		.2byte	0x1
+ 2521 03de 54       		.byte	0x54
+ 2522 03df 6A000000 		.4byte	.LVL74
+ 2523 03e3 6A000000 		.4byte	.LVL75
+ 2524 03e7 0300     		.2byte	0x3
+ 2525 03e9 76       		.byte	0x76
+ 2526 03ea 74       		.sleb128 -12
+ 2527 03eb 9F       		.byte	0x9f
+ 2528 03ec 6A000000 		.4byte	.LVL75
+ 2529 03f0 6C000000 		.4byte	.LFE37
+ 2530 03f4 0400     		.2byte	0x4
+ 2531 03f6 F3       		.byte	0xf3
+ 2532 03f7 01       		.uleb128 0x1
+ 2533 03f8 50       		.byte	0x50
+ 2534 03f9 9F       		.byte	0x9f
+ 2535 03fa 00000000 		.4byte	0
+ 2536 03fe 00000000 		.4byte	0
+ 2537              	.LLST24:
+ 2538 0402 00000000 		.4byte	.LVL56
+ 2539 0406 0D000000 		.4byte	.LVL59-1
+ 2540 040a 0100     		.2byte	0x1
+ 2541 040c 51       		.byte	0x51
+ 2542 040d 0D000000 		.4byte	.LVL59-1
+ 2543 0411 14000000 		.4byte	.LVL61
+ 2544 0415 0100     		.2byte	0x1
+ 2545 0417 55       		.byte	0x55
+ 2546 0418 14000000 		.4byte	.LVL61
+ 2547 041c 6C000000 		.4byte	.LFE37
+ 2548 0420 0400     		.2byte	0x4
+ 2549 0422 F3       		.byte	0xf3
+ 2550 0423 01       		.uleb128 0x1
+ 2551 0424 51       		.byte	0x51
+ 2552 0425 9F       		.byte	0x9f
+ 2553 0426 00000000 		.4byte	0
+ 2554 042a 00000000 		.4byte	0
+ 2555              	.LLST25:
+ 2556 042e 10000000 		.4byte	.LVL60
+ 2557 0432 57000000 		.4byte	.LVL71-1
+ 2558 0436 0100     		.2byte	0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 60
+
+
+ 2559 0438 50       		.byte	0x50
+ 2560 0439 5A000000 		.4byte	.LVL72
+ 2561 043d 67000000 		.4byte	.LVL73-1
+ 2562 0441 0100     		.2byte	0x1
+ 2563 0443 50       		.byte	0x50
+ 2564 0444 00000000 		.4byte	0
+ 2565 0448 00000000 		.4byte	0
+ 2566              	.LLST26:
+ 2567 044c 1C000000 		.4byte	.LVL63
+ 2568 0450 5A000000 		.4byte	.LVL72
+ 2569 0454 0100     		.2byte	0x1
+ 2570 0456 55       		.byte	0x55
+ 2571 0457 00000000 		.4byte	0
+ 2572 045b 00000000 		.4byte	0
+ 2573              	.LLST27:
+ 2574 045f 0A000000 		.4byte	.LVL58
+ 2575 0463 6A000000 		.4byte	.LVL75
+ 2576 0467 0100     		.2byte	0x1
+ 2577 0469 56       		.byte	0x56
+ 2578 046a 6A000000 		.4byte	.LVL75
+ 2579 046e 6C000000 		.4byte	.LFE37
+ 2580 0472 0600     		.2byte	0x6
+ 2581 0474 F3       		.byte	0xf3
+ 2582 0475 01       		.uleb128 0x1
+ 2583 0476 50       		.byte	0x50
+ 2584 0477 23       		.byte	0x23
+ 2585 0478 0C       		.uleb128 0xc
+ 2586 0479 9F       		.byte	0x9f
+ 2587 047a 00000000 		.4byte	0
+ 2588 047e 00000000 		.4byte	0
+ 2589              	.LLST28:
+ 2590 0482 06000000 		.4byte	.LVL57
+ 2591 0486 0D000000 		.4byte	.LVL59-1
+ 2592 048a 0300     		.2byte	0x3
+ 2593 048c 70       		.byte	0x70
+ 2594 048d 04       		.sleb128 4
+ 2595 048e 9F       		.byte	0x9f
+ 2596 048f 0D000000 		.4byte	.LVL59-1
+ 2597 0493 6A000000 		.4byte	.LVL74
+ 2598 0497 0300     		.2byte	0x3
+ 2599 0499 74       		.byte	0x74
+ 2600 049a 04       		.sleb128 4
+ 2601 049b 9F       		.byte	0x9f
+ 2602 049c 6A000000 		.4byte	.LVL74
+ 2603 04a0 6A000000 		.4byte	.LVL75
+ 2604 04a4 0300     		.2byte	0x3
+ 2605 04a6 76       		.byte	0x76
+ 2606 04a7 78       		.sleb128 -8
+ 2607 04a8 9F       		.byte	0x9f
+ 2608 04a9 6A000000 		.4byte	.LVL75
+ 2609 04ad 6C000000 		.4byte	.LFE37
+ 2610 04b1 0600     		.2byte	0x6
+ 2611 04b3 F3       		.byte	0xf3
+ 2612 04b4 01       		.uleb128 0x1
+ 2613 04b5 50       		.byte	0x50
+ 2614 04b6 23       		.byte	0x23
+ 2615 04b7 04       		.uleb128 0x4
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 61
+
+
+ 2616 04b8 9F       		.byte	0x9f
+ 2617 04b9 00000000 		.4byte	0
+ 2618 04bd 00000000 		.4byte	0
+ 2619              	.LLST29:
+ 2620 04c1 06000000 		.4byte	.LVL57
+ 2621 04c5 1A000000 		.4byte	.LVL62
+ 2622 04c9 0200     		.2byte	0x2
+ 2623 04cb 30       		.byte	0x30
+ 2624 04cc 9F       		.byte	0x9f
+ 2625 04cd 1A000000 		.4byte	.LVL62
+ 2626 04d1 6A000000 		.4byte	.LVL76
+ 2627 04d5 0100     		.2byte	0x1
+ 2628 04d7 57       		.byte	0x57
+ 2629 04d8 00000000 		.4byte	0
+ 2630 04dc 00000000 		.4byte	0
+ 2631              	.LLST30:
+ 2632 04e0 1E000000 		.4byte	.LVL64
+ 2633 04e4 22000000 		.4byte	.LVL65
+ 2634 04e8 0100     		.2byte	0x1
+ 2635 04ea 52       		.byte	0x52
+ 2636 04eb 22000000 		.4byte	.LVL65
+ 2637 04ef 52000000 		.4byte	.LVL70
+ 2638 04f3 0100     		.2byte	0x1
+ 2639 04f5 53       		.byte	0x53
+ 2640 04f6 52000000 		.4byte	.LVL70
+ 2641 04fa 57000000 		.4byte	.LVL71-1
+ 2642 04fe 0800     		.2byte	0x8
+ 2643 0500 70       		.byte	0x70
+ 2644 0501 00       		.sleb128 0
+ 2645 0502 06       		.byte	0x6
+ 2646 0503 38       		.byte	0x38
+ 2647 0504 24       		.byte	0x24
+ 2648 0505 38       		.byte	0x38
+ 2649 0506 25       		.byte	0x25
+ 2650 0507 9F       		.byte	0x9f
+ 2651 0508 00000000 		.4byte	0
+ 2652 050c 00000000 		.4byte	0
+ 2653              	.LLST31:
+ 2654 0510 1E000000 		.4byte	.LVL64
+ 2655 0514 4A000000 		.4byte	.LVL67
+ 2656 0518 0800     		.2byte	0x8
+ 2657 051a 72       		.byte	0x72
+ 2658 051b 00       		.sleb128 0
+ 2659 051c 40       		.byte	0x40
+ 2660 051d 44       		.byte	0x44
+ 2661 051e 24       		.byte	0x24
+ 2662 051f 1F       		.byte	0x1f
+ 2663 0520 1A       		.byte	0x1a
+ 2664 0521 9F       		.byte	0x9f
+ 2665 0522 4A000000 		.4byte	.LVL67
+ 2666 0526 57000000 		.4byte	.LVL71-1
+ 2667 052a 0900     		.2byte	0x9
+ 2668 052c 70       		.byte	0x70
+ 2669 052d 00       		.sleb128 0
+ 2670 052e 06       		.byte	0x6
+ 2671 052f 40       		.byte	0x40
+ 2672 0530 44       		.byte	0x44
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 62
+
+
+ 2673 0531 24       		.byte	0x24
+ 2674 0532 1F       		.byte	0x1f
+ 2675 0533 1A       		.byte	0x1a
+ 2676 0534 9F       		.byte	0x9f
+ 2677 0535 00000000 		.4byte	0
+ 2678 0539 00000000 		.4byte	0
+ 2679              	.LLST32:
+ 2680 053d 06000000 		.4byte	.LVL57
+ 2681 0541 0D000000 		.4byte	.LVL59-1
+ 2682 0545 0100     		.2byte	0x1
+ 2683 0547 50       		.byte	0x50
+ 2684 0548 0D000000 		.4byte	.LVL59-1
+ 2685 054c 6A000000 		.4byte	.LVL74
+ 2686 0550 0100     		.2byte	0x1
+ 2687 0552 54       		.byte	0x54
+ 2688 0553 6A000000 		.4byte	.LVL74
+ 2689 0557 6A000000 		.4byte	.LVL75
+ 2690 055b 0300     		.2byte	0x3
+ 2691 055d 76       		.byte	0x76
+ 2692 055e 74       		.sleb128 -12
+ 2693 055f 9F       		.byte	0x9f
+ 2694 0560 6A000000 		.4byte	.LVL75
+ 2695 0564 6C000000 		.4byte	.LFE37
+ 2696 0568 0400     		.2byte	0x4
+ 2697 056a F3       		.byte	0xf3
+ 2698 056b 01       		.uleb128 0x1
+ 2699 056c 50       		.byte	0x50
+ 2700 056d 9F       		.byte	0x9f
+ 2701 056e 00000000 		.4byte	0
+ 2702 0572 00000000 		.4byte	0
+ 2703              	.LLST33:
+ 2704 0576 06000000 		.4byte	.LVL57
+ 2705 057a 1A000000 		.4byte	.LVL62
+ 2706 057e 0200     		.2byte	0x2
+ 2707 0580 30       		.byte	0x30
+ 2708 0581 9F       		.byte	0x9f
+ 2709 0582 1E000000 		.4byte	.LVL64
+ 2710 0586 42000000 		.4byte	.LVL66
+ 2711 058a 0200     		.2byte	0x2
+ 2712 058c 30       		.byte	0x30
+ 2713 058d 9F       		.byte	0x9f
+ 2714 058e 42000000 		.4byte	.LVL66
+ 2715 0592 4E000000 		.4byte	.LVL69
+ 2716 0596 0100     		.2byte	0x1
+ 2717 0598 51       		.byte	0x51
+ 2718 0599 00000000 		.4byte	0
+ 2719 059d 00000000 		.4byte	0
+ 2720              	.LLST34:
+ 2721 05a1 00000000 		.4byte	.LVL77
+ 2722 05a5 0F000000 		.4byte	.LVL79-1
+ 2723 05a9 0100     		.2byte	0x1
+ 2724 05ab 50       		.byte	0x50
+ 2725 05ac 0F000000 		.4byte	.LVL79-1
+ 2726 05b0 82000000 		.4byte	.LVL100
+ 2727 05b4 0100     		.2byte	0x1
+ 2728 05b6 56       		.byte	0x56
+ 2729 05b7 82000000 		.4byte	.LVL100
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 63
+
+
+ 2730 05bb 84000000 		.4byte	.LFE33
+ 2731 05bf 0400     		.2byte	0x4
+ 2732 05c1 F3       		.byte	0xf3
+ 2733 05c2 01       		.uleb128 0x1
+ 2734 05c3 50       		.byte	0x50
+ 2735 05c4 9F       		.byte	0x9f
+ 2736 05c5 00000000 		.4byte	0
+ 2737 05c9 00000000 		.4byte	0
+ 2738              	.LLST35:
+ 2739 05cd 00000000 		.4byte	.LVL77
+ 2740 05d1 0F000000 		.4byte	.LVL79-1
+ 2741 05d5 0100     		.2byte	0x1
+ 2742 05d7 51       		.byte	0x51
+ 2743 05d8 0F000000 		.4byte	.LVL79-1
+ 2744 05dc 84000000 		.4byte	.LFE33
+ 2745 05e0 0200     		.2byte	0x2
+ 2746 05e2 91       		.byte	0x91
+ 2747 05e3 64       		.sleb128 -28
+ 2748 05e4 00000000 		.4byte	0
+ 2749 05e8 00000000 		.4byte	0
+ 2750              	.LLST36:
+ 2751 05ec 00000000 		.4byte	.LVL77
+ 2752 05f0 0F000000 		.4byte	.LVL79-1
+ 2753 05f4 0100     		.2byte	0x1
+ 2754 05f6 52       		.byte	0x52
+ 2755 05f7 0F000000 		.4byte	.LVL79-1
+ 2756 05fb 82000000 		.4byte	.LVL101
+ 2757 05ff 0100     		.2byte	0x1
+ 2758 0601 57       		.byte	0x57
+ 2759 0602 82000000 		.4byte	.LVL101
+ 2760 0606 84000000 		.4byte	.LFE33
+ 2761 060a 0400     		.2byte	0x4
+ 2762 060c F3       		.byte	0xf3
+ 2763 060d 01       		.uleb128 0x1
+ 2764 060e 52       		.byte	0x52
+ 2765 060f 9F       		.byte	0x9f
+ 2766 0610 00000000 		.4byte	0
+ 2767 0614 00000000 		.4byte	0
+ 2768              	.LLST37:
+ 2769 0618 00000000 		.4byte	.LVL77
+ 2770 061c 0F000000 		.4byte	.LVL79-1
+ 2771 0620 0100     		.2byte	0x1
+ 2772 0622 53       		.byte	0x53
+ 2773 0623 0F000000 		.4byte	.LVL79-1
+ 2774 0627 2C000000 		.4byte	.LVL84
+ 2775 062b 0100     		.2byte	0x1
+ 2776 062d 55       		.byte	0x55
+ 2777 062e 2C000000 		.4byte	.LVL84
+ 2778 0632 30000000 		.4byte	.LVL85
+ 2779 0636 0200     		.2byte	0x2
+ 2780 0638 30       		.byte	0x30
+ 2781 0639 9F       		.byte	0x9f
+ 2782 063a 30000000 		.4byte	.LVL85
+ 2783 063e 82000000 		.4byte	.LVL99
+ 2784 0642 0100     		.2byte	0x1
+ 2785 0644 55       		.byte	0x55
+ 2786 0645 00000000 		.4byte	0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 64
+
+
+ 2787 0649 00000000 		.4byte	0
+ 2788              	.LLST38:
+ 2789 064d 12000000 		.4byte	.LVL80
+ 2790 0651 1E000000 		.4byte	.LVL82
+ 2791 0655 0100     		.2byte	0x1
+ 2792 0657 54       		.byte	0x54
+ 2793 0658 00000000 		.4byte	0
+ 2794 065c 00000000 		.4byte	0
+ 2795              	.LLST39:
+ 2796 0660 26000000 		.4byte	.LVL83
+ 2797 0664 30000000 		.4byte	.LVL85
+ 2798 0668 0100     		.2byte	0x1
+ 2799 066a 54       		.byte	0x54
+ 2800 066b 42000000 		.4byte	.LVL86
+ 2801 066f 46000000 		.4byte	.LVL87
+ 2802 0673 0200     		.2byte	0x2
+ 2803 0675 30       		.byte	0x30
+ 2804 0676 9F       		.byte	0x9f
+ 2805 0677 48000000 		.4byte	.LVL88
+ 2806 067b 5E000000 		.4byte	.LVL92
+ 2807 067f 0100     		.2byte	0x1
+ 2808 0681 54       		.byte	0x54
+ 2809 0682 5E000000 		.4byte	.LVL92
+ 2810 0686 65000000 		.4byte	.LVL93-1
+ 2811 068a 0100     		.2byte	0x1
+ 2812 068c 50       		.byte	0x50
+ 2813 068d 65000000 		.4byte	.LVL93-1
+ 2814 0691 7C000000 		.4byte	.LVL96
+ 2815 0695 0100     		.2byte	0x1
+ 2816 0697 54       		.byte	0x54
+ 2817 0698 7E000000 		.4byte	.LVL97
+ 2818 069c 82000000 		.4byte	.LVL98
+ 2819 06a0 0100     		.2byte	0x1
+ 2820 06a2 54       		.byte	0x54
+ 2821 06a3 82000000 		.4byte	.LVL98
+ 2822 06a7 84000000 		.4byte	.LFE33
+ 2823 06ab 0100     		.2byte	0x1
+ 2824 06ad 50       		.byte	0x50
+ 2825 06ae 00000000 		.4byte	0
+ 2826 06b2 00000000 		.4byte	0
+ 2827              	.LLST40:
+ 2828 06b6 0C000000 		.4byte	.LVL78
+ 2829 06ba 0F000000 		.4byte	.LVL79-1
+ 2830 06be 0100     		.2byte	0x1
+ 2831 06c0 50       		.byte	0x50
+ 2832 06c1 0F000000 		.4byte	.LVL79-1
+ 2833 06c5 82000000 		.4byte	.LVL100
+ 2834 06c9 0100     		.2byte	0x1
+ 2835 06cb 56       		.byte	0x56
+ 2836 06cc 82000000 		.4byte	.LVL100
+ 2837 06d0 84000000 		.4byte	.LFE33
+ 2838 06d4 0400     		.2byte	0x4
+ 2839 06d6 F3       		.byte	0xf3
+ 2840 06d7 01       		.uleb128 0x1
+ 2841 06d8 50       		.byte	0x50
+ 2842 06d9 9F       		.byte	0x9f
+ 2843 06da 00000000 		.4byte	0
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 65
+
+
+ 2844 06de 00000000 		.4byte	0
+ 2845              	.LLST41:
+ 2846 06e2 4C000000 		.4byte	.LVL89
+ 2847 06e6 57000000 		.4byte	.LVL90-1
+ 2848 06ea 0100     		.2byte	0x1
+ 2849 06ec 50       		.byte	0x50
+ 2850 06ed 00000000 		.4byte	0
+ 2851 06f1 00000000 		.4byte	0
+ 2852              	.LLST42:
+ 2853 06f5 0C000000 		.4byte	.LVL78
+ 2854 06f9 48000000 		.4byte	.LVL88
+ 2855 06fd 0200     		.2byte	0x2
+ 2856 06ff 30       		.byte	0x30
+ 2857 0700 9F       		.byte	0x9f
+ 2858 0701 00000000 		.4byte	0
+ 2859 0705 00000000 		.4byte	0
+ 2860              	.LLST43:
+ 2861 0709 00000000 		.4byte	.LVL102
+ 2862 070d 07000000 		.4byte	.LVL104-1
+ 2863 0711 0100     		.2byte	0x1
+ 2864 0713 50       		.byte	0x50
+ 2865 0714 07000000 		.4byte	.LVL104-1
+ 2866 0718 24000000 		.4byte	.LVL108
+ 2867 071c 0100     		.2byte	0x1
+ 2868 071e 54       		.byte	0x54
+ 2869 071f 24000000 		.4byte	.LVL108
+ 2870 0723 26000000 		.4byte	.LFE38
+ 2871 0727 0400     		.2byte	0x4
+ 2872 0729 F3       		.byte	0xf3
+ 2873 072a 01       		.uleb128 0x1
+ 2874 072b 50       		.byte	0x50
+ 2875 072c 9F       		.byte	0x9f
+ 2876 072d 00000000 		.4byte	0
+ 2877 0731 00000000 		.4byte	0
+ 2878              	.LLST44:
+ 2879 0735 04000000 		.4byte	.LVL103
+ 2880 0739 07000000 		.4byte	.LVL104-1
+ 2881 073d 0100     		.2byte	0x1
+ 2882 073f 50       		.byte	0x50
+ 2883 0740 07000000 		.4byte	.LVL104-1
+ 2884 0744 24000000 		.4byte	.LVL108
+ 2885 0748 0100     		.2byte	0x1
+ 2886 074a 54       		.byte	0x54
+ 2887 074b 24000000 		.4byte	.LVL108
+ 2888 074f 26000000 		.4byte	.LFE38
+ 2889 0753 0400     		.2byte	0x4
+ 2890 0755 F3       		.byte	0xf3
+ 2891 0756 01       		.uleb128 0x1
+ 2892 0757 50       		.byte	0x50
+ 2893 0758 9F       		.byte	0x9f
+ 2894 0759 00000000 		.4byte	0
+ 2895 075d 00000000 		.4byte	0
+ 2896              	.LLST45:
+ 2897 0761 04000000 		.4byte	.LVL103
+ 2898 0765 07000000 		.4byte	.LVL104-1
+ 2899 0769 0300     		.2byte	0x3
+ 2900 076b 70       		.byte	0x70
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 66
+
+
+ 2901 076c 04       		.sleb128 4
+ 2902 076d 9F       		.byte	0x9f
+ 2903 076e 07000000 		.4byte	.LVL104-1
+ 2904 0772 24000000 		.4byte	.LVL108
+ 2905 0776 0300     		.2byte	0x3
+ 2906 0778 74       		.byte	0x74
+ 2907 0779 04       		.sleb128 4
+ 2908 077a 9F       		.byte	0x9f
+ 2909 077b 24000000 		.4byte	.LVL108
+ 2910 077f 26000000 		.4byte	.LFE38
+ 2911 0783 0600     		.2byte	0x6
+ 2912 0785 F3       		.byte	0xf3
+ 2913 0786 01       		.uleb128 0x1
+ 2914 0787 50       		.byte	0x50
+ 2915 0788 23       		.byte	0x23
+ 2916 0789 04       		.uleb128 0x4
+ 2917 078a 9F       		.byte	0x9f
+ 2918 078b 00000000 		.4byte	0
+ 2919 078f 00000000 		.4byte	0
+ 2920              	.LLST46:
+ 2921 0793 00000000 		.4byte	.LVL109
+ 2922 0797 05000000 		.4byte	.LVL110-1
+ 2923 079b 0100     		.2byte	0x1
+ 2924 079d 50       		.byte	0x50
+ 2925 079e 05000000 		.4byte	.LVL110-1
+ 2926 07a2 08000000 		.4byte	.LFE39
+ 2927 07a6 0400     		.2byte	0x4
+ 2928 07a8 F3       		.byte	0xf3
+ 2929 07a9 01       		.uleb128 0x1
+ 2930 07aa 50       		.byte	0x50
+ 2931 07ab 9F       		.byte	0x9f
+ 2932 07ac 00000000 		.4byte	0
+ 2933 07b0 00000000 		.4byte	0
+ 2934              	.LLST47:
+ 2935 07b4 00000000 		.4byte	.LVL109
+ 2936 07b8 05000000 		.4byte	.LVL110-1
+ 2937 07bc 0100     		.2byte	0x1
+ 2938 07be 51       		.byte	0x51
+ 2939 07bf 05000000 		.4byte	.LVL110-1
+ 2940 07c3 08000000 		.4byte	.LFE39
+ 2941 07c7 0400     		.2byte	0x4
+ 2942 07c9 F3       		.byte	0xf3
+ 2943 07ca 01       		.uleb128 0x1
+ 2944 07cb 51       		.byte	0x51
+ 2945 07cc 9F       		.byte	0x9f
+ 2946 07cd 00000000 		.4byte	0
+ 2947 07d1 00000000 		.4byte	0
+ 2948              	.LLST48:
+ 2949 07d5 00000000 		.4byte	.LVL111
+ 2950 07d9 05000000 		.4byte	.LVL112-1
+ 2951 07dd 0100     		.2byte	0x1
+ 2952 07df 50       		.byte	0x50
+ 2953 07e0 05000000 		.4byte	.LVL112-1
+ 2954 07e4 08000000 		.4byte	.LFE40
+ 2955 07e8 0400     		.2byte	0x4
+ 2956 07ea F3       		.byte	0xf3
+ 2957 07eb 01       		.uleb128 0x1
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 67
+
+
+ 2958 07ec 50       		.byte	0x50
+ 2959 07ed 9F       		.byte	0x9f
+ 2960 07ee 00000000 		.4byte	0
+ 2961 07f2 00000000 		.4byte	0
+ 2962              	.LLST49:
+ 2963 07f6 00000000 		.4byte	.LVL111
+ 2964 07fa 05000000 		.4byte	.LVL112-1
+ 2965 07fe 0100     		.2byte	0x1
+ 2966 0800 51       		.byte	0x51
+ 2967 0801 05000000 		.4byte	.LVL112-1
+ 2968 0805 08000000 		.4byte	.LFE40
+ 2969 0809 0400     		.2byte	0x4
+ 2970 080b F3       		.byte	0xf3
+ 2971 080c 01       		.uleb128 0x1
+ 2972 080d 51       		.byte	0x51
+ 2973 080e 9F       		.byte	0x9f
+ 2974 080f 00000000 		.4byte	0
+ 2975 0813 00000000 		.4byte	0
+ 2976              		.section	.debug_aranges,"",%progbits
+ 2977 0000 64000000 		.4byte	0x64
+ 2978 0004 0200     		.2byte	0x2
+ 2979 0006 00000000 		.4byte	.Ldebug_info0
+ 2980 000a 04       		.byte	0x4
+ 2981 000b 00       		.byte	0
+ 2982 000c 0000     		.2byte	0
+ 2983 000e 0000     		.2byte	0
+ 2984 0010 00000000 		.4byte	.LFB41
+ 2985 0014 1E000000 		.4byte	.LFE41-.LFB41
+ 2986 0018 00000000 		.4byte	.LFB32
+ 2987 001c 18000000 		.4byte	.LFE32-.LFB32
+ 2988 0020 00000000 		.4byte	.LFB34
+ 2989 0024 A8000000 		.4byte	.LFE34-.LFB34
+ 2990 0028 00000000 		.4byte	.LFB35
+ 2991 002c 1A000000 		.4byte	.LFE35-.LFB35
+ 2992 0030 00000000 		.4byte	.LFB36
+ 2993 0034 12000000 		.4byte	.LFE36-.LFB36
+ 2994 0038 00000000 		.4byte	.LFB37
+ 2995 003c 6C000000 		.4byte	.LFE37-.LFB37
+ 2996 0040 00000000 		.4byte	.LFB33
+ 2997 0044 84000000 		.4byte	.LFE33-.LFB33
+ 2998 0048 00000000 		.4byte	.LFB38
+ 2999 004c 26000000 		.4byte	.LFE38-.LFB38
+ 3000 0050 00000000 		.4byte	.LFB39
+ 3001 0054 08000000 		.4byte	.LFE39-.LFB39
+ 3002 0058 00000000 		.4byte	.LFB40
+ 3003 005c 08000000 		.4byte	.LFE40-.LFB40
+ 3004 0060 00000000 		.4byte	0
+ 3005 0064 00000000 		.4byte	0
+ 3006              		.section	.debug_ranges,"",%progbits
+ 3007              	.Ldebug_ranges0:
+ 3008 0000 10000000 		.4byte	.LBB2
+ 3009 0004 3A000000 		.4byte	.LBE2
+ 3010 0008 3E000000 		.4byte	.LBB3
+ 3011 000c 60000000 		.4byte	.LBE3
+ 3012 0010 00000000 		.4byte	0
+ 3013 0014 00000000 		.4byte	0
+ 3014 0018 00000000 		.4byte	.LFB41
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 68
+
+
+ 3015 001c 1E000000 		.4byte	.LFE41
+ 3016 0020 00000000 		.4byte	.LFB32
+ 3017 0024 18000000 		.4byte	.LFE32
+ 3018 0028 00000000 		.4byte	.LFB34
+ 3019 002c A8000000 		.4byte	.LFE34
+ 3020 0030 00000000 		.4byte	.LFB35
+ 3021 0034 1A000000 		.4byte	.LFE35
+ 3022 0038 00000000 		.4byte	.LFB36
+ 3023 003c 12000000 		.4byte	.LFE36
+ 3024 0040 00000000 		.4byte	.LFB37
+ 3025 0044 6C000000 		.4byte	.LFE37
+ 3026 0048 00000000 		.4byte	.LFB33
+ 3027 004c 84000000 		.4byte	.LFE33
+ 3028 0050 00000000 		.4byte	.LFB38
+ 3029 0054 26000000 		.4byte	.LFE38
+ 3030 0058 00000000 		.4byte	.LFB39
+ 3031 005c 08000000 		.4byte	.LFE39
+ 3032 0060 00000000 		.4byte	.LFB40
+ 3033 0064 08000000 		.4byte	.LFE40
+ 3034 0068 00000000 		.4byte	0
+ 3035 006c 00000000 		.4byte	0
+ 3036              		.section	.debug_line,"",%progbits
+ 3037              	.Ldebug_line0:
+ 3038 0000 06030000 		.section	.debug_str,"MS",%progbits,1
+ 3038      0200AC01 
+ 3038      00000201 
+ 3038      FB0E0D00 
+ 3038      01010101 
+ 3039              	.LASF84:
+ 3040 0000 76546173 		.ascii	"vTaskRemoveFromUnorderedEventList\000"
+ 3040      6B52656D 
+ 3040      6F766546 
+ 3040      726F6D55 
+ 3040      6E6F7264 
+ 3041              	.LASF44:
+ 3042 0022 78457665 		.ascii	"xEventGroupCreate\000"
+ 3042      6E744772 
+ 3042      6F757043 
+ 3042      72656174 
+ 3042      6500
+ 3043              	.LASF75:
+ 3044 0034 76546173 		.ascii	"vTaskPlaceOnUnorderedEventList\000"
+ 3044      6B506C61 
+ 3044      63654F6E 
+ 3044      556E6F72 
+ 3044      64657265 
+ 3045              	.LASF41:
+ 3046 0053 78576169 		.ascii	"xWaitForAllBits\000"
+ 3046      74466F72 
+ 3046      416C6C42 
+ 3046      69747300 
+ 3047              	.LASF60:
+ 3048 0063 70784C69 		.ascii	"pxListEnd\000"
+ 3048      7374456E 
+ 3048      6400
+ 3049              	.LASF74:
+ 3050 006d 764C6973 		.ascii	"vListInitialise\000"
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 69
+
+
+ 3050      74496E69 
+ 3050      7469616C 
+ 3050      69736500 
+ 3051              	.LASF82:
+ 3052 007d 756C5365 		.ascii	"ulSetInterruptMaskFromISR\000"
+ 3052      74496E74 
+ 3052      65727275 
+ 3052      70744D61 
+ 3052      736B4672 
+ 3053              	.LASF5:
+ 3054 0097 73686F72 		.ascii	"short int\000"
+ 3054      7420696E 
+ 3054      7400
+ 3055              	.LASF31:
+ 3056 00a1 784C6973 		.ascii	"xListEnd\000"
+ 3056      74456E64 
+ 3056      00
+ 3057              	.LASF21:
+ 3058 00aa 70785072 		.ascii	"pxPrevious\000"
+ 3058      6576696F 
+ 3058      757300
+ 3059              	.LASF47:
+ 3060 00b5 78436C65 		.ascii	"xClearOnExit\000"
+ 3060      61724F6E 
+ 3060      45786974 
+ 3060      00
+ 3061              	.LASF12:
+ 3062 00c2 5F5F7569 		.ascii	"__uint32_t\000"
+ 3062      6E743332 
+ 3062      5F7400
+ 3063              	.LASF34:
+ 3064 00cd 4576656E 		.ascii	"EventBits_t\000"
+ 3064      74426974 
+ 3064      735F7400 
+ 3065              	.LASF42:
+ 3066 00d9 78576169 		.ascii	"xWaitConditionMet\000"
+ 3066      74436F6E 
+ 3066      64697469 
+ 3066      6F6E4D65 
+ 3066      7400
+ 3067              	.LASF22:
+ 3068 00eb 70764F77 		.ascii	"pvOwner\000"
+ 3068      6E657200 
+ 3069              	.LASF48:
+ 3070 00f3 78546963 		.ascii	"xTicksToWait\000"
+ 3070      6B73546F 
+ 3070      57616974 
+ 3070      00
+ 3071              	.LASF86:
+ 3072 0100 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3072      43313120 
+ 3072      352E342E 
+ 3072      31203230 
+ 3072      31363036 
+ 3073 0133 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m0 -mthumb -g -O"
+ 3073      20726576 
+ 3073      6973696F 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 70
+
+
+ 3073      6E203233 
+ 3073      37373135 
+ 3074 0166 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 3074      66756E63 
+ 3074      74696F6E 
+ 3074      2D736563 
+ 3074      74696F6E 
+ 3075              	.LASF33:
+ 3076 018e 4576656E 		.ascii	"EventGroupHandle_t\000"
+ 3076      7447726F 
+ 3076      75704861 
+ 3076      6E646C65 
+ 3076      5F7400
+ 3077              	.LASF83:
+ 3078 01a1 76436C65 		.ascii	"vClearInterruptMaskFromISR\000"
+ 3078      6172496E 
+ 3078      74657272 
+ 3078      7570744D 
+ 3078      61736B46 
+ 3079              	.LASF62:
+ 3080 01bc 75784269 		.ascii	"uxBitsWaitedFor\000"
+ 3080      74735761 
+ 3080      69746564 
+ 3080      466F7200 
+ 3081              	.LASF67:
+ 3082 01cc 76457665 		.ascii	"vEventGroupDelete\000"
+ 3082      6E744772 
+ 3082      6F757044 
+ 3082      656C6574 
+ 3082      6500
+ 3083              	.LASF88:
+ 3084 01de 433A5C55 		.ascii	"C:\\Users\\Xwx47\\Documents\\Creator\\FreeRTOS_49-4"
+ 3084      73657273 
+ 3084      5C587778 
+ 3084      34375C44 
+ 3084      6F63756D 
+ 3085 020c 3278785C 		.ascii	"2xx\\UART_MessageBuffer_FreeRTOS10.cydsn\000"
+ 3085      55415254 
+ 3085      5F4D6573 
+ 3085      73616765 
+ 3085      42756666 
+ 3086              	.LASF14:
+ 3087 0234 666C6F61 		.ascii	"float\000"
+ 3087      7400
+ 3088              	.LASF40:
+ 3089 023a 75784269 		.ascii	"uxBitsToWaitFor\000"
+ 3089      7473546F 
+ 3089      57616974 
+ 3089      466F7200 
+ 3090              	.LASF32:
+ 3091 024a 4C697374 		.ascii	"List_t\000"
+ 3091      5F7400
+ 3092              	.LASF27:
+ 3093 0251 4D696E69 		.ascii	"MiniListItem_t\000"
+ 3093      4C697374 
+ 3093      4974656D 
+ 3093      5F7400
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 71
+
+
+ 3094              	.LASF1:
+ 3095 0260 6C6F6E67 		.ascii	"long long int\000"
+ 3095      206C6F6E 
+ 3095      6720696E 
+ 3095      7400
+ 3096              	.LASF71:
+ 3097 026e 76457665 		.ascii	"vEventGroupClearBitsCallback\000"
+ 3097      6E744772 
+ 3097      6F757043 
+ 3097      6C656172 
+ 3097      42697473 
+ 3098              	.LASF61:
+ 3099 028b 70784C69 		.ascii	"pxList\000"
+ 3099      737400
+ 3100              	.LASF7:
+ 3101 0292 6C6F6E67 		.ascii	"long int\000"
+ 3101      20696E74 
+ 3101      00
+ 3102              	.LASF28:
+ 3103 029b 784C4953 		.ascii	"xLIST\000"
+ 3103      5400
+ 3104              	.LASF35:
+ 3105 02a1 78457665 		.ascii	"xEventGroupDefinition\000"
+ 3105      6E744772 
+ 3105      6F757044 
+ 3105      6566696E 
+ 3105      6974696F 
+ 3106              	.LASF59:
+ 3107 02b7 70784C69 		.ascii	"pxListItem\000"
+ 3107      73744974 
+ 3107      656D00
+ 3108              	.LASF19:
+ 3109 02c2 78497465 		.ascii	"xItemValue\000"
+ 3109      6D56616C 
+ 3109      756500
+ 3110              	.LASF70:
+ 3111 02cd 756C4269 		.ascii	"ulBitsToSet\000"
+ 3111      7473546F 
+ 3111      53657400 
+ 3112              	.LASF37:
+ 3113 02d9 78546173 		.ascii	"xTasksWaitingForBits\000"
+ 3113      6B735761 
+ 3113      6974696E 
+ 3113      67466F72 
+ 3113      42697473 
+ 3114              	.LASF64:
+ 3115 02ee 78457665 		.ascii	"xEventGroupSync\000"
+ 3115      6E744772 
+ 3115      6F757053 
+ 3115      796E6300 
+ 3116              	.LASF25:
+ 3117 02fe 784C4953 		.ascii	"xLIST_ITEM\000"
+ 3117      545F4954 
+ 3117      454D00
+ 3118              	.LASF53:
+ 3119 0309 78457665 		.ascii	"xEventGroupClearBits\000"
+ 3119      6E744772 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 72
+
+
+ 3119      6F757043 
+ 3119      6C656172 
+ 3119      42697473 
+ 3120              	.LASF18:
+ 3121 031e 5469636B 		.ascii	"TickType_t\000"
+ 3121      54797065 
+ 3121      5F7400
+ 3122              	.LASF2:
+ 3123 0329 6C6F6E67 		.ascii	"long double\000"
+ 3123      20646F75 
+ 3123      626C6500 
+ 3124              	.LASF4:
+ 3125 0335 756E7369 		.ascii	"unsigned char\000"
+ 3125      676E6564 
+ 3125      20636861 
+ 3125      7200
+ 3126              	.LASF3:
+ 3127 0343 7369676E 		.ascii	"signed char\000"
+ 3127      65642063 
+ 3127      68617200 
+ 3128              	.LASF9:
+ 3129 034f 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3129      206C6F6E 
+ 3129      6720756E 
+ 3129      7369676E 
+ 3129      65642069 
+ 3130              	.LASF13:
+ 3131 0366 75696E74 		.ascii	"uint32_t\000"
+ 3131      33325F74 
+ 3131      00
+ 3132              	.LASF69:
+ 3133 036f 70764576 		.ascii	"pvEventGroup\000"
+ 3133      656E7447 
+ 3133      726F7570 
+ 3133      00
+ 3134              	.LASF0:
+ 3135 037c 756E7369 		.ascii	"unsigned int\000"
+ 3135      676E6564 
+ 3135      20696E74 
+ 3135      00
+ 3136              	.LASF24:
+ 3137 0389 4C697374 		.ascii	"ListItem_t\000"
+ 3137      4974656D 
+ 3137      5F7400
+ 3138              	.LASF16:
+ 3139 0394 42617365 		.ascii	"BaseType_t\000"
+ 3139      54797065 
+ 3139      5F7400
+ 3140              	.LASF23:
+ 3141 039f 7076436F 		.ascii	"pvContainer\000"
+ 3141      6E746169 
+ 3141      6E657200 
+ 3142              	.LASF45:
+ 3143 03ab 78457665 		.ascii	"xEventGroupWaitBits\000"
+ 3143      6E744772 
+ 3143      6F757057 
+ 3143      61697442 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 73
+
+
+ 3143      69747300 
+ 3144              	.LASF77:
+ 3145 03bf 78546173 		.ascii	"xTaskResumeAll\000"
+ 3145      6B526573 
+ 3145      756D6541 
+ 3145      6C6C00
+ 3146              	.LASF6:
+ 3147 03ce 73686F72 		.ascii	"short unsigned int\000"
+ 3147      7420756E 
+ 3147      7369676E 
+ 3147      65642069 
+ 3147      6E7400
+ 3148              	.LASF80:
+ 3149 03e1 76506F72 		.ascii	"vPortEnterCritical\000"
+ 3149      74456E74 
+ 3149      65724372 
+ 3149      69746963 
+ 3149      616C00
+ 3150              	.LASF89:
+ 3151 03f4 70727654 		.ascii	"prvTestWaitCondition\000"
+ 3151      65737457 
+ 3151      61697443 
+ 3151      6F6E6469 
+ 3151      74696F6E 
+ 3152              	.LASF11:
+ 3153 0409 63686172 		.ascii	"char\000"
+ 3153      00
+ 3154              	.LASF20:
+ 3155 040e 70784E65 		.ascii	"pxNext\000"
+ 3155      787400
+ 3156              	.LASF78:
+ 3157 0415 76506F72 		.ascii	"vPortYield\000"
+ 3157      74596965 
+ 3157      6C6400
+ 3158              	.LASF65:
+ 3159 0420 75784F72 		.ascii	"uxOriginalBitValue\000"
+ 3159      6967696E 
+ 3159      616C4269 
+ 3159      7456616C 
+ 3159      756500
+ 3160              	.LASF36:
+ 3161 0433 75784576 		.ascii	"uxEventBits\000"
+ 3161      656E7442 
+ 3161      69747300 
+ 3162              	.LASF81:
+ 3163 043f 76506F72 		.ascii	"vPortExitCritical\000"
+ 3163      74457869 
+ 3163      74437269 
+ 3163      74696361 
+ 3163      6C00
+ 3164              	.LASF50:
+ 3165 0451 7578436F 		.ascii	"uxControlBits\000"
+ 3165      6E74726F 
+ 3165      6C426974 
+ 3165      7300
+ 3166              	.LASF55:
+ 3167 045f 78457665 		.ascii	"xEventGroupGetBitsFromISR\000"
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 74
+
+
+ 3167      6E744772 
+ 3167      6F757047 
+ 3167      65744269 
+ 3167      74734672 
+ 3168              	.LASF57:
+ 3169 0479 78457665 		.ascii	"xEventGroupSetBits\000"
+ 3169      6E744772 
+ 3169      6F757053 
+ 3169      65744269 
+ 3169      747300
+ 3170              	.LASF49:
+ 3171 048c 75785265 		.ascii	"uxReturn\000"
+ 3171      7475726E 
+ 3171      00
+ 3172              	.LASF8:
+ 3173 0495 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3173      20756E73 
+ 3173      69676E65 
+ 3173      6420696E 
+ 3173      7400
+ 3174              	.LASF17:
+ 3175 04a7 55426173 		.ascii	"UBaseType_t\000"
+ 3175      65547970 
+ 3175      655F7400 
+ 3176              	.LASF85:
+ 3177 04b3 76506F72 		.ascii	"vPortFree\000"
+ 3177      74467265 
+ 3177      6500
+ 3178              	.LASF29:
+ 3179 04bd 75784E75 		.ascii	"uxNumberOfItems\000"
+ 3179      6D626572 
+ 3179      4F664974 
+ 3179      656D7300 
+ 3180              	.LASF79:
+ 3181 04cd 75785461 		.ascii	"uxTaskResetEventItemValue\000"
+ 3181      736B5265 
+ 3181      73657445 
+ 3181      76656E74 
+ 3181      4974656D 
+ 3182              	.LASF56:
+ 3183 04e7 75785361 		.ascii	"uxSavedInterruptStatus\000"
+ 3183      76656449 
+ 3183      6E746572 
+ 3183      72757074 
+ 3183      53746174 
+ 3184              	.LASF10:
+ 3185 04fe 73697A65 		.ascii	"sizetype\000"
+ 3185      74797065 
+ 3185      00
+ 3186              	.LASF63:
+ 3187 0507 784D6174 		.ascii	"xMatchFound\000"
+ 3187      6368466F 
+ 3187      756E6400 
+ 3188              	.LASF46:
+ 3189 0513 78457665 		.ascii	"xEventGroup\000"
+ 3189      6E744772 
+ 3189      6F757000 
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 75
+
+
+ 3190              	.LASF54:
+ 3191 051f 75784269 		.ascii	"uxBitsToClear\000"
+ 3191      7473546F 
+ 3191      436C6561 
+ 3191      7200
+ 3192              	.LASF15:
+ 3193 052d 646F7562 		.ascii	"double\000"
+ 3193      6C6500
+ 3194              	.LASF43:
+ 3195 0534 70784576 		.ascii	"pxEventBits\000"
+ 3195      656E7442 
+ 3195      69747300 
+ 3196              	.LASF87:
+ 3197 0540 2E2E5C46 		.ascii	"..\\FreeRTOS10\\event_groups.c\000"
+ 3197      72656552 
+ 3197      544F5331 
+ 3197      305C6576 
+ 3197      656E745F 
+ 3198              	.LASF30:
+ 3199 055d 7078496E 		.ascii	"pxIndex\000"
+ 3199      64657800 
+ 3200              	.LASF52:
+ 3201 0565 7854696D 		.ascii	"xTimeoutOccurred\000"
+ 3201      656F7574 
+ 3201      4F636375 
+ 3201      72726564 
+ 3201      00
+ 3202              	.LASF68:
+ 3203 0576 76457665 		.ascii	"vEventGroupSetBitsCallback\000"
+ 3203      6E744772 
+ 3203      6F757053 
+ 3203      65744269 
+ 3203      74734361 
+ 3204              	.LASF26:
+ 3205 0591 784D494E 		.ascii	"xMINI_LIST_ITEM\000"
+ 3205      495F4C49 
+ 3205      53545F49 
+ 3205      54454D00 
+ 3206              	.LASF39:
+ 3207 05a1 75784375 		.ascii	"uxCurrentEventBits\000"
+ 3207      7272656E 
+ 3207      74457665 
+ 3207      6E744269 
+ 3207      747300
+ 3208              	.LASF73:
+ 3209 05b4 7076506F 		.ascii	"pvPortMalloc\000"
+ 3209      72744D61 
+ 3209      6C6C6F63 
+ 3209      00
+ 3210              	.LASF66:
+ 3211 05c1 70785461 		.ascii	"pxTasksWaitingForBits\000"
+ 3211      736B7357 
+ 3211      61697469 
+ 3211      6E67466F 
+ 3211      72426974 
+ 3212              	.LASF76:
+ 3213 05d7 76546173 		.ascii	"vTaskSuspendAll\000"
+ARM GAS  C:\Users\Xwx47\AppData\Local\Temp\ccJcQvke.s 			page 76
+
+
+ 3213      6B537573 
+ 3213      70656E64 
+ 3213      416C6C00 
+ 3214              	.LASF51:
+ 3215 05e7 78416C72 		.ascii	"xAlreadyYielded\000"
+ 3215      65616479 
+ 3215      5969656C 
+ 3215      64656400 
+ 3216              	.LASF58:
+ 3217 05f7 75784269 		.ascii	"uxBitsToSet\000"
+ 3217      7473546F 
+ 3217      53657400 
+ 3218              	.LASF72:
+ 3219 0603 756C4269 		.ascii	"ulBitsToClear\000"
+ 3219      7473546F 
+ 3219      436C6561 
+ 3219      7200
+ 3220              	.LASF38:
+ 3221 0611 4576656E 		.ascii	"EventGroup_t\000"
+ 3221      7447726F 
+ 3221      75705F74 
+ 3221      00
+ 3222              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
